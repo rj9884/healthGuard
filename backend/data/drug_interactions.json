@@ -1,0 +1,24 @@
+{
+  "interactions": {
+    "aspirin": ["warfarin", "ibuprofen", "naproxen", "heparin"],
+    "warfarin": ["aspirin", "ibuprofen", "acetaminophen", "vitamin_k"],
+    "ibuprofen": ["aspirin", "warfarin", "lithium", "methotrexate"],
+    "metformin": ["alcohol", "contrast_dye"],
+    "lisinopril": ["potassium_supplements", "spironolactone"],
+    "simvastatin": ["grapefruit", "erythromycin", "clarithromycin"],
+    "amoxicillin": ["methotrexate", "warfarin"],
+    "omeprazole": ["clopidogrel", "methotrexate"],
+    "metoprolol": ["verapamil", "diltiazem", "clonidine"],
+    "amlodipine": ["simvastatin", "cyclosporine"],
+    "acetaminophen": ["warfarin", "alcohol"],
+    "naproxen": ["aspirin", "warfarin", "lithium"],
+    "prednisone": ["aspirin", "ibuprofen", "warfarin", "diabetes_medications"],
+    "fluoxetine": ["tramadol", "monoamine_oxidase_inhibitors", "warfarin"],
+    "sertraline": ["tramadol", "monoamine_oxidase_inhibitors", "warfarin"],
+    "levothyroxine": ["calcium_supplements", "iron_supplements", "antacids"],
+    "atorvastatin": ["grapefruit", "erythromycin", "cyclosporine"],
+    "losartan": ["potassium_supplements", "lithium"],
+    "hydrochlorothiazide": ["lithium", "digoxin"],
+    "gabapentin": ["antacids", "morphine"]
+  }
+}
