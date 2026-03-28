@@ -60,6 +60,8 @@ npm run dev
 - Frontend app: `http://localhost:3000`
 - Backend API docs: `http://localhost:8000/docs`
 
+By default the frontend is configured to use mock data so charts, tables, and cards render immediately for UI review. Set `NEXT_PUBLIC_USE_MOCK_DATA=false` to force live API usage.
+
 ## Docker
 
 ```bash

@@ -6,20 +6,25 @@ import type {
   SymptomEntry,
 } from "@/lib/api/types";
 import {
-  mockDashboard,
-  mockMedications,
-  mockPatterns,
-  mockSummary,
-  mockSymptoms,
-} from "@/lib/api/mock-data";
-import { deleteJson, fetchJson, postFormData, postJson } from "@/lib/api/client";
+  addMockMedication,
+  addMockSymptom,
+  getMockChatReply,
+  getMockDashboard,
+  getMockImageResult,
+  getMockMedications,
+  getMockPatterns,
+  getMockSummary,
+  getMockSymptoms,
+  removeMockMedication,
+} from "@/lib/api/mock-store";
+import { deleteJson, fetchJson, postFormData, postJson, USE_MOCK_DATA } from "@/lib/api/client";
 
 export function getDashboard() {
-  return fetchJson<DashboardPayload>("/dashboard", mockDashboard);
+  return fetchJson<DashboardPayload>("/dashboard", getMockDashboard());
 }
 
 export function getSymptoms() {
-  return fetchJson<SymptomEntry[]>("/symptoms?limit=12", mockSymptoms);
+  return fetchJson<SymptomEntry[]>("/symptoms?limit=12", getMockSymptoms());
 }
 
 export function createSymptom(payload: {
@@ -30,11 +35,23 @@ export function createSymptom(payload: {
   relief?: string[];
   notes?: string | null;
 }) {
+  if (USE_MOCK_DATA) {
+    return Promise.resolve(
+      addMockSymptom({
+        symptom: payload.symptom,
+        severity: payload.severity,
+        duration_hr: payload.duration_hr ?? null,
+        triggers: payload.triggers ?? [],
+        relief: payload.relief ?? [],
+        notes: payload.notes ?? null,
+      }),
+    );
+  }
   return postJson<SymptomEntry, typeof payload>("/symptoms", payload);
 }
 
 export function getMedications() {
-  return fetchJson<MedicationEntry[]>("/medications", mockMedications);
+  return fetchJson<MedicationEntry[]>("/medications", getMockMedications());
 }
 
 export function createMedication(payload: {
@@ -44,21 +61,36 @@ export function createMedication(payload: {
   start_date?: string | null;
   notes?: string | null;
 }) {
+  if (USE_MOCK_DATA) {
+    return Promise.resolve(
+      addMockMedication({
+        name: payload.name,
+        dosage: payload.dosage ?? null,
+        frequency: payload.frequency ?? null,
+        start_date: payload.start_date ?? null,
+        notes: payload.notes ?? null,
+      }),
+    );
+  }
   return postJson<MedicationEntry, typeof payload>("/medications", payload);
 }
 
 export function removeMedication(id: number) {
+  if (USE_MOCK_DATA) {
+    removeMockMedication(id);
+    return Promise.resolve();
+  }
   return deleteJson(`/medications/${id}`);
 }
 
 export function getAnalysisSummary() {
-  return fetchJson<AnalysisSummaryItem[]>("/analysis/summary", mockSummary);
+  return fetchJson<AnalysisSummaryItem[]>("/analysis/summary", getMockSummary());
 }
 
 export function getPatterns(symptom: string) {
   return fetchJson<PatternResponse>(
     `/analysis/patterns/${encodeURIComponent(symptom)}`,
-    mockPatterns[symptom] ?? mockPatterns.headache,
+    getMockPatterns(symptom),
   );
 }
 
@@ -68,10 +100,16 @@ export function getReport() {
 }
 
 export function seedDemoData() {
+  if (USE_MOCK_DATA) {
+    return Promise.resolve({ message: "Mock mode is already enabled." });
+  }
   return postJson<{ message: string }, Record<string, never>>("/analysis/demo-data", {});
 }
 
 export function classifyImage(file: File) {
+  if (USE_MOCK_DATA) {
+    return Promise.resolve(getMockImageResult());
+  }
   const formData = new FormData();
   formData.append("file", file);
   return postFormData<{
@@ -81,5 +119,8 @@ export function classifyImage(file: File) {
 }
 
 export function askHealthAi(payload: { message: string; history?: Array<{ role: string; content: string }> }) {
+  if (USE_MOCK_DATA) {
+    return Promise.resolve(getMockChatReply(payload.message));
+  }
   return postJson<{ reply: string }, typeof payload>("/chat", payload);
 }

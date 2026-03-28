@@ -21,6 +21,7 @@ import { StatCard } from "@/components/shared/stat-card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { getDashboard, getReport } from "@/lib/api/healthguard";
+import { USE_MOCK_DATA } from "@/lib/api/client";
 
 export function DashboardScreen() {
   const { data } = useQuery({
@@ -72,7 +73,7 @@ export function DashboardScreen() {
         <SectionCard
           title="Severity trend"
           description="A rolling view of recent symptom intensity."
-          action={<Badge>Updated from backend</Badge>}
+          action={<Badge>{USE_MOCK_DATA ? "Mock data" : "Live backend"}</Badge>}
         >
           <div className="h-80">
             <ResponsiveContainer width="100%" height="100%">
@@ -122,12 +123,18 @@ export function DashboardScreen() {
                 <ArrowUpRight className="h-4 w-4 text-muted-foreground" />
               </div>
             ))}
-            <a href={getReport()} target="_blank" rel="noreferrer">
-              <Button className="w-full">
-                <FileDown className="h-4 w-4" />
-                Download health report
-              </Button>
-            </a>
+            {USE_MOCK_DATA ? (
+              <div className="rounded-2xl border border-border bg-muted/40 px-4 py-4 text-sm text-muted-foreground">
+                Mock mode is active. The patterns page includes a report preview for UI review.
+              </div>
+            ) : (
+              <a href={getReport()} target="_blank" rel="noreferrer">
+                <Button className="w-full">
+                  <FileDown className="h-4 w-4" />
+                  Download health report
+                </Button>
+              </a>
+            )}
           </div>
         </SectionCard>
       </div>
