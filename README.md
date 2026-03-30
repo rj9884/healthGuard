@@ -8,7 +8,7 @@ HealthGuard is now a split-stack product codebase:
 ## Stack
 
 - Frontend: Next.js, React, TypeScript, Tailwind CSS, shadcn-style components, React Query, React Hook Form, Zod, Recharts
-- Backend: FastAPI, SQLAlchemy, pandas/scipy analysis, Anthropic integration, HuggingFace image classification
+- Backend: FastAPI, SQLAlchemy, pandas/scipy analysis, OpenRouter-backed AI chat, HuggingFace image classification
 - Database: SQLite
 - Infra: Docker Compose
 

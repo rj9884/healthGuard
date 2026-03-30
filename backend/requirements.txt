@@ -1,6 +1,5 @@
 fastapi[standard]>=0.115.0
 sqlalchemy>=2.0.30
-anthropic>=0.28.0
 pandas>=2.2.0
 scipy>=1.13.0
 matplotlib>=3.9.0

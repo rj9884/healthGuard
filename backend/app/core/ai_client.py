@@ -1,7 +1,6 @@
-import anthropic
-from app.config import ANTHROPIC_API_KEY
+import httpx
 
-client = anthropic.Anthropic(api_key=ANTHROPIC_API_KEY)
+from app.config import OPENROUTER_API_KEY, OPENROUTER_MODEL
 
 SYSTEM_PROMPT = """
 You are an AI health assistant helping users understand their health patterns.
@@ -32,12 +31,23 @@ def chat_with_health_ai(user_message: str, history: list, user_context: dict) ->
             f"\n\n[User's recent symptom history: {user_context['recent_symptoms']}]"
         )
 
-    messages = history + [{"role": "user", "content": user_message + context_block}]
+    messages = [{"role": "system", "content": SYSTEM_PROMPT}, *history]
+    messages.append({"role": "user", "content": user_message + context_block})
 
-    response = client.messages.create(
-        model="claude-sonnet-4-20250514",
-        max_tokens=1024,
-        system=SYSTEM_PROMPT,
-        messages=messages,
-    )
-    return response.content[0].text
+    with httpx.Client(timeout=60) as client:
+        response = client.post(
+            "https://openrouter.ai/api/v1/chat/completions",
+            headers={
+                "Authorization": f"Bearer {OPENROUTER_API_KEY}",
+                "Content-Type": "application/json",
+            },
+            json={
+                "model": OPENROUTER_MODEL,
+                "messages": messages,
+                "stream": False,
+            },
+        )
+        response.raise_for_status()
+        payload = response.json()
+
+    return payload["choices"][0]["message"]["content"]
