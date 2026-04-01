@@ -106,21 +106,35 @@ export function seedDemoData() {
   return postJson<{ message: string }, Record<string, never>>("/analysis/demo-data", {});
 }
 
-export function classifyImage(file: File) {
-  if (USE_MOCK_DATA) {
-    return Promise.resolve(getMockImageResult());
-  }
+export async function classifyImage(file: File) {
   const formData = new FormData();
   formData.append("file", file);
+
+  if (USE_MOCK_DATA) {
+    try {
+      return await postFormData<{
+        observations: Array<{ label: string; score: number }>;
+        recommendation: string;
+      }>("/image/classify", formData);
+    } catch {
+      return getMockImageResult();
+    }
+  }
+
   return postFormData<{
     observations: Array<{ label: string; score: number }>;
     recommendation: string;
   }>("/image/classify", formData);
 }
 
-export function askHealthAi(payload: { message: string; history?: Array<{ role: string; content: string }> }) {
+export async function askHealthAi(payload: { message: string; history?: Array<{ role: string; content: string }> }) {
   if (USE_MOCK_DATA) {
-    return Promise.resolve(getMockChatReply(payload.message));
+    try {
+      return await postJson<{ reply: string }, typeof payload>("/chat", payload);
+    } catch {
+      return Promise.resolve(getMockChatReply(payload.message));
+    }
   }
+
   return postJson<{ reply: string }, typeof payload>("/chat", payload);
 }

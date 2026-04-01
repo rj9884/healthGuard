@@ -1,7 +1,8 @@
 "use client";
 
-import { type ChangeEvent, useState } from "react";
+import { type ChangeEvent, useEffect, useRef, useState } from "react";
 import { Camera, ShieldAlert, UploadCloud } from "lucide-react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 import { PageHeader } from "@/components/layout/page-header";
 import { SectionCard } from "@/components/shared/section-card";
@@ -15,31 +16,86 @@ export function ScreenerScreen() {
     observations: Array<{ label: string; score: number }>;
     recommendation: string;
   } | null>(null);
+  const [analysisStatus, setAnalysisStatus] = useState<"idle" | "analyzing" | "completed" | "failed">("idle");
   const [isLoading, setIsLoading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const queryClient = useQueryClient();
 
-  async function handleUpload(event: ChangeEvent<HTMLInputElement>) {
+  useEffect(() => {
+    const saved = queryClient.getQueryData<{
+      observations: Array<{ label: string; score: number }>;
+      recommendation: string;
+    }>(["screenerResult"]);
+
+    if (saved) {
+      setResult(saved);
+      setAnalysisStatus("completed");
+      return;
+    }
+
+    try {
+      const persisted = window.localStorage.getItem("screenerResult");
+      const status = window.localStorage.getItem("screenerStatus");
+
+      if (status === "analyzing") {
+        setAnalysisStatus("analyzing");
+        toast("Image analysis is still running in the background.");
+      }
+
+      if (persisted) {
+        setResult(JSON.parse(persisted));
+        if (status === "completed") {
+          setAnalysisStatus("completed");
+        }
+      }
+    } catch {
+      // ignore localStorage issues
+    }
+  }, [queryClient]);
+
+  const classifyMutation = useMutation<{ observations: Array<{ label: string; score: number }>; recommendation: string }, unknown, File>({
+    mutationFn: (file: File) => classifyImage(file),
+    onMutate: () => {
+      setAnalysisStatus("analyzing");
+      setIsLoading(true);
+      try {
+        window.localStorage.setItem("screenerStatus", "analyzing");
+      } catch {
+        // ignore storage errors
+      }
+      toast("Analyzing image...", { icon: "⏳" });
+    },
+    onSuccess: (data) => {
+      setResult(data);
+      setAnalysisStatus("completed");
+      queryClient.setQueryData(["screenerResult"], data);
+      try {
+        window.localStorage.setItem("screenerResult", JSON.stringify(data));
+        window.localStorage.setItem("screenerStatus", "completed");
+      } catch {
+        // ignore storage errors
+      }
+      toast.success("Image analysis completed");
+    },
+    onError: () => {
+      setAnalysisStatus("failed");
+      toast.error("Could not analyze image");
+    },
+    onSettled: () => {
+      setIsLoading(false);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = "";
+      }
+    },
+  });
+
+  function handleUpload(event: ChangeEvent<HTMLInputElement>) {
     const file = event.target.files?.[0];
     if (!file) {
       return;
     }
 
-    setIsLoading(true);
-    try {
-      const response = await classifyImage(file);
-      setResult(response);
-    } catch {
-      toast.error("Could not analyze image");
-      setResult({
-        observations: [
-          { label: "Benign-appearing rash", score: 0.68 },
-          { label: "Inflammatory skin condition", score: 0.22 },
-        ],
-        recommendation:
-          "This educational screen suggests documenting the image and seeking professional evaluation if the lesion is persistent, painful, or changing.",
-      });
-    } finally {
-      setIsLoading(false);
-    }
+    classifyMutation.mutate(file);
   }
 
   return (
@@ -64,7 +120,13 @@ export function ScreenerScreen() {
               <p className="font-display text-lg font-semibold">Drop or browse an image</p>
               <p className="text-sm text-muted-foreground">PNG, JPG, WEBP supported</p>
             </div>
-            <input className="hidden" type="file" accept="image/*" onChange={handleUpload} />
+            <input
+              ref={fileInputRef}
+              className="hidden"
+              type="file"
+              accept="image/*"
+              onChange={handleUpload}
+            />
           </label>
           <div className="mt-4 flex items-start gap-3 rounded-2xl bg-warning/10 p-4 text-warning">
             <ShieldAlert className="mt-0.5 h-4 w-4 shrink-0" />
@@ -78,6 +140,16 @@ export function ScreenerScreen() {
           title="Results"
           description="Confidence-ranked observations and a care-oriented recommendation."
         >
+          {analysisStatus === "analyzing" && (
+            <div className="mb-4 rounded-2xl border border-primary/40 bg-primary/10 p-3 text-sm font-medium text-primary">
+              Analysis is running in the background. You can continue navigating freely.
+            </div>
+          )}
+          {analysisStatus === "failed" && (
+            <div className="mb-4 rounded-2xl border border-destructive/40 bg-destructive/10 p-3 text-sm font-medium text-destructive">
+              Analysis failed. Try uploading again.
+            </div>
+          )}
           {!result ? (
             <div className="flex min-h-72 flex-col items-center justify-center gap-4 rounded-3xl border border-dashed border-border bg-muted/30 text-center">
               <div className="rounded-full bg-primary/10 p-4 text-primary">
