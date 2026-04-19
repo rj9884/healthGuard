@@ -12,3 +12,7 @@ venv/
 frontend/node_modules/
 frontend/.next/
 backend/.pytest_cache/
+.~lock.HealthGuard_Project_Report.docx#
+CSE 205 - Project Report Format.docx.pdf
+generate_report.py
+report_instruction.md
