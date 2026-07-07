@@ -5,6 +5,7 @@ from sqlalchemy.orm import Session
 from app.api.deps import get_current_user_id
 from app.models.database import get_db
 from app.services.analysis_service import build_report, get_patterns, get_summary, load_demo_data
+from app.core.pattern_engine import get_longitudinal_analysis
 
 router = APIRouter()
 
@@ -15,6 +16,14 @@ def summary(
     user_id: str = Depends(get_current_user_id),
 ):
     return get_summary(db, user_id=user_id)
+
+
+@router.get("/longitudinal")
+def longitudinal(
+    db: Session = Depends(get_db),
+    user_id: str = Depends(get_current_user_id),
+):
+    return get_longitudinal_analysis(db, user_id=user_id)
 
 
 @router.get("/patterns/{symptom}")

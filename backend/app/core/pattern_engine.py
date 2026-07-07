@@ -1,62 +1,68 @@
 import pandas as pd
 from sqlalchemy.orm import Session
 from app.models.symptom import SymptomLog
+from app.ml.anomaly_detector import detect_anomalies_and_correlations
+
+
+def get_longitudinal_analysis(db: Session, user_id: str) -> dict:
+    """
+    Runs unsupervised Isolation Forest anomaly detection and Scipy statistical hypothesis testing
+    across the user's entire longitudinal vitals and symptom history.
+    """
+    rows = db.query(SymptomLog).filter(SymptomLog.user_id == user_id).order_by(SymptomLog.timestamp.asc()).all()
+    ml_results = detect_anomalies_and_correlations(rows)
+    
+    # Calculate triage urgency distribution across user history
+    triage_dist = {}
+    for r in rows:
+        t_level = getattr(r, "triage_level", "Self-Care") or "Self-Care"
+        triage_dist[t_level] = triage_dist.get(t_level, 0) + 1
+        
+    ml_results["triage_distribution"] = triage_dist
+    return ml_results
 
 
 def analyze_patterns(db: Session, user_id: str, symptom: str) -> dict:
     """
-    Load symptom history and compute trigger confidence scores.
-    Confidence = weighted combination of trigger frequency and associated severity.
+    Load symptom history and compute statistical correlation matrix and trigger impact.
     """
     rows = (
         db.query(SymptomLog)
-        .filter(SymptomLog.user_id == user_id, SymptomLog.symptom == symptom)
+        .filter(SymptomLog.user_id == user_id)
         .all()
     )
 
-    if len(rows) < 5:
-        return {"message": "Log at least 5 entries to enable pattern analysis."}
-
-    df = pd.DataFrame(
-        [
-            {
-                "timestamp": r.timestamp,
-                "severity": r.severity,
-                "triggers": r.triggers or [],
-            }
-            for r in rows
-        ]
-    )
-
-    # Explode the triggers list column into individual rows
-    trigger_df = df.explode("triggers").dropna(subset=["triggers"])
-
-    if trigger_df.empty:
+    if len(rows) < 3:
         return {
             "symptom": symptom,
             "total_logs": len(rows),
             "triggers": [],
-            "message": "No triggers logged yet. Add triggers when logging symptoms.",
+            "message": "Log at least 3 health check-ins to enable ML longitudinal statistical pattern analysis."
         }
 
-    trigger_freq = (
-        trigger_df.groupby("triggers")["severity"]
-        .agg(count="count", avg_severity="mean")
-        .reset_index()
-    )
-
-    # Confidence = 60% frequency weight + 40% severity weight
-    trigger_freq["confidence"] = (
-        trigger_freq["count"] / trigger_freq["count"].max() * 0.6
-        + trigger_freq["avg_severity"] / 10 * 0.4
-    ).round(2)
-
-    top_triggers = trigger_freq.sort_values("confidence", ascending=False).head(5)
+    # Run full ML anomaly and correlation engine on user history
+    ml_insights = detect_anomalies_and_correlations(rows)
+    
+    # Filter specific symptom rows for backward compatibility with frontend lists
+    symptom_rows = [r for r in rows if r.symptom == symptom]
+    
+    triggers_list = []
+    if symptom_rows:
+        df = pd.DataFrame([
+            {"timestamp": r.timestamp, "severity": r.severity, "triggers": r.triggers or []}
+            for r in symptom_rows
+        ])
+        trigger_df = df.explode("triggers").dropna(subset=["triggers"])
+        if not trigger_df.empty:
+            trigger_freq = trigger_df.groupby("triggers")["severity"].agg(count="count", avg_severity="mean").reset_index()
+            trigger_freq["confidence"] = (trigger_freq["count"] / trigger_freq["count"].max() * 0.6 + trigger_freq["avg_severity"] / 10 * 0.4).round(2)
+            triggers_list = trigger_freq.sort_values("confidence", ascending=False).head(5).to_dict(orient="records")
 
     return {
         "symptom": symptom,
-        "total_logs": len(rows),
-        "triggers": top_triggers.to_dict(orient="records"),
+        "total_logs": len(symptom_rows),
+        "triggers": triggers_list,
+        "ml_longitudinal_insights": ml_insights
     }
 
 
