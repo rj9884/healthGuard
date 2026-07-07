@@ -4,6 +4,7 @@ import type {
   MedicationEntry,
   PatternResponse,
   SymptomEntry,
+  LongitudinalAnalysis,
 } from "@/lib/api/types";
 import {
   addMockMedication,
@@ -24,7 +25,7 @@ export function getDashboard() {
 }
 
 export function getSymptoms() {
-  return fetchJson<SymptomEntry[]>("/symptoms?limit=12", getMockSymptoms());
+  return fetchJson<SymptomEntry[]>("/symptoms?limit=25", getMockSymptoms());
 }
 
 export function createSymptom(payload: {
@@ -34,6 +35,11 @@ export function createSymptom(payload: {
   triggers?: string[];
   relief?: string[];
   notes?: string | null;
+  sleep_hours?: number;
+  stress_level?: number;
+  hydration_liters?: number;
+  body_temperature_f?: number;
+  heart_rate_bpm?: number;
 }) {
   if (USE_MOCK_DATA) {
     return Promise.resolve(
@@ -44,7 +50,7 @@ export function createSymptom(payload: {
         triggers: payload.triggers ?? [],
         relief: payload.relief ?? [],
         notes: payload.notes ?? null,
-      }),
+      }) as SymptomEntry,
     );
   }
   return postJson<SymptomEntry, typeof payload>("/symptoms", payload);
@@ -87,6 +93,15 @@ export function getAnalysisSummary() {
   return fetchJson<AnalysisSummaryItem[]>("/analysis/summary", getMockSummary());
 }
 
+export function getLongitudinalAnalysis() {
+  return fetchJson<LongitudinalAnalysis>("/analysis/longitudinal", {
+    total_logs_analyzed: 12,
+    recent_anomaly_detected: false,
+    anomaly_alert_message: null,
+    correlation_matrix: [],
+  });
+}
+
 export function getPatterns(symptom: string) {
   return fetchJson<PatternResponse>(
     `/analysis/patterns/${encodeURIComponent(symptom)}`,
@@ -115,6 +130,8 @@ export async function classifyImage(file: File) {
       return await postFormData<{
         observations: Array<{ label: string; score: number }>;
         recommendation: string;
+        risk_level?: string;
+        confidence?: number;
       }>("/image/classify", formData);
     } catch {
       return getMockImageResult();
@@ -124,7 +141,20 @@ export async function classifyImage(file: File) {
   return postFormData<{
     observations: Array<{ label: string; score: number }>;
     recommendation: string;
+    risk_level?: string;
+    confidence?: number;
   }>("/image/classify", formData);
+}
+
+export async function evaluateAbcde(features: Record<string, boolean>) {
+  return postJson<{
+    risk_level: string;
+    confidence: number;
+    abcde_score: number;
+    key_risk_factors: Array<{ feature: string; label: string; importance: number }>;
+    recommendation: string;
+    disclaimer: string;
+  }, typeof features>("/image/evaluate-abcde", features);
 }
 
 export async function askHealthAi(payload: { message: string; history?: Array<{ role: string; content: string }> }) {

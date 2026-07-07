@@ -1,7 +1,7 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-import { ArrowUpRight, FileDown, Sparkles } from "lucide-react";
+import { ArrowUpRight, FileDown, Sparkles, ShieldAlert, Cpu, HeartPulse, CheckCircle2 } from "lucide-react";
 import {
   Area,
   AreaChart,
@@ -20,7 +20,7 @@ import { SeverityBadge } from "@/components/shared/severity-badge";
 import { StatCard } from "@/components/shared/stat-card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { getDashboard, getReport } from "@/lib/api/healthguard";
+import { getDashboard, getReport, getLongitudinalAnalysis } from "@/lib/api/healthguard";
 import { USE_MOCK_DATA } from "@/lib/api/client";
 
 export function DashboardScreen() {
@@ -29,9 +29,16 @@ export function DashboardScreen() {
     queryFn: getDashboard,
   });
 
+  const { data: longData } = useQuery({
+    queryKey: ["longitudinal"],
+    queryFn: getLongitudinalAnalysis,
+  });
+
   if (!data) {
     return null;
   }
+
+  const latestWithShap = data.recentSymptoms.find((s) => s.triage_level || s.shap_explanation_json);
 
   return (
     <div className="space-y-8">
@@ -41,6 +48,84 @@ export function DashboardScreen() {
         description="Monitor symptom trends, trigger frequency, medication context, and care-prep actions from a single dashboard."
         badge="Main dashboard"
       />
+
+      {/* Isolation Forest Anomaly Alert Banner */}
+      {longData?.recent_anomaly_detected && (
+        <div className="rounded-3xl border-2 border-amber-500/50 bg-gradient-to-r from-amber-500/15 via-amber-500/5 to-transparent p-6 shadow-soft animate-pulse">
+          <div className="flex items-start gap-4">
+            <div className="rounded-2xl bg-amber-500/20 p-3 text-amber-700 dark:text-amber-400">
+              <ShieldAlert className="h-6 w-6" />
+            </div>
+            <div>
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-bold uppercase tracking-wider text-amber-700 dark:text-amber-400">
+                  Isolation Forest Biometric Outlier Alert
+                </span>
+              </div>
+              <h3 className="mt-1 font-display text-xl font-bold text-slate-900 dark:text-white">
+                Physiological Anomaly Detected in Recent Check-In
+              </h3>
+              <p className="mt-1 text-sm text-slate-700 dark:text-slate-300 leading-relaxed">
+                {longData.anomaly_alert_message || "Our unsupervised model detected an unusual convergence of sleep deprivation, high stress, and elevated severity."}
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Latest SHAP Clinical Triage Breakdown */}
+      {latestWithShap && (
+        <div className="rounded-3xl border border-emerald-500/30 bg-gradient-to-br from-emerald-500/10 via-white to-slate-50 p-6 shadow-soft">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-4 border-b border-emerald-500/20 pb-4">
+            <div className="flex items-center gap-3">
+              <div className="rounded-2xl bg-emerald-600 p-3 text-white shadow-md">
+                <Cpu className="h-6 w-6" />
+              </div>
+              <div>
+                <span className="text-xs font-bold uppercase tracking-wider text-emerald-700">
+                  Explainable AI (SHAP TreeExplainer)
+                </span>
+                <h3 className="font-display text-xl font-bold text-slate-900 capitalize">
+                  Latest Triage Assessment: {latestWithShap.symptom}
+                </h3>
+              </div>
+            </div>
+            <div className="flex items-center gap-3">
+              <span className="rounded-full bg-emerald-100 px-3 py-1.5 text-xs font-bold text-emerald-800 border border-emerald-300">
+                Triage Level: {latestWithShap.triage_level || "Routine Checkup"}
+              </span>
+              {latestWithShap.predicted_disease_risk && (
+                <span className="rounded-full bg-slate-900 px-3 py-1.5 text-xs font-bold text-white">
+                  Risk Category: {latestWithShap.predicted_disease_risk}
+                </span>
+              )}
+            </div>
+          </div>
+
+          <p className="text-sm text-slate-700 mb-4 font-medium">
+            {latestWithShap.shap_explanation_json?.human_readable_summary || 
+              `Your assessment for ${latestWithShap.predicted_disease_risk || latestWithShap.symptom} was calculated using gradient boosted trees.`}
+          </p>
+
+          {latestWithShap.shap_explanation_json?.top_contributing_features && (
+            <div>
+              <p className="text-xs font-bold uppercase tracking-wider text-slate-500 mb-2">
+                Top Contributing Shapley Attribution Factors
+              </p>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                {latestWithShap.shap_explanation_json.top_contributing_features.slice(0, 3).map((feat: any, idx: number) => (
+                  <div key={idx} className="rounded-xl border border-slate-200 bg-white/80 p-3 shadow-sm">
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs font-bold text-slate-800">{feat.label}</span>
+                      <span className="text-xs font-extrabold text-emerald-600">+{feat.importance_score}% impact</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+      )}
 
       <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
         <StatCard

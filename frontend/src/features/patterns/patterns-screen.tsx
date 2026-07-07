@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
+import { LineChart, Sparkles, ShieldCheck, Activity } from "lucide-react";
 
 import { PageHeader } from "@/components/layout/page-header";
 import { SectionCard } from "@/components/shared/section-card";
@@ -15,7 +16,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { getAnalysisSummary, getPatterns } from "@/lib/api/healthguard";
+import { getAnalysisSummary, getPatterns, getLongitudinalAnalysis } from "@/lib/api/healthguard";
 
 export function PatternsScreen() {
   const { data: summary = [] } = useQuery({
@@ -37,6 +38,11 @@ export function PatternsScreen() {
     enabled: Boolean(selectedSymptom),
   });
 
+  const { data: longData } = useQuery({
+    queryKey: ["longitudinal"],
+    queryFn: getLongitudinalAnalysis,
+  });
+
   const chartData = useMemo(
     () =>
       (patternData?.triggers ?? []).map((item) => ({
@@ -49,10 +55,62 @@ export function PatternsScreen() {
   return (
     <div className="space-y-8">
       <PageHeader
-        eyebrow="Patterns"
-        title="Turn raw logs into trigger-level pattern visibility"
-        description="This analysis surface helps users inspect what shows up most often and how strongly it correlates with symptom intensity."
+        eyebrow="Patterns & Correlations"
+        title="Turn longitudinal vitals into statistical hypothesis test insights"
+        description="Our machine learning engine evaluates Pearson correlation coefficients (p-values) and Mutual Information across your symptom history to separate true lifestyle triggers from noise."
       />
+
+      {/* Longitudinal Statistical Correlation Matrix Table */}
+      {longData && longData.correlation_matrix && longData.correlation_matrix.length > 0 && (
+        <SectionCard
+          title="Longitudinal Statistical Correlation Matrix"
+          description={`Computed using Scipy hypothesis testing across ${longData.total_logs_analyzed} health check-ins.`}
+          action={<Badge className="bg-emerald-600 text-white">Scipy p-Value Engine</Badge>}
+        >
+          <div className="overflow-x-auto">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead className="font-bold">Biometric Trigger / Vital</TableHead>
+                  <TableHead className="font-bold">Clinical Impact</TableHead>
+                  <TableHead className="font-bold">Pearson Correlation (r)</TableHead>
+                  <TableHead className="font-bold">Scipy p-Value</TableHead>
+                  <TableHead className="font-bold">Mutual Information Score</TableHead>
+                  <TableHead className="font-bold">Statistical Significance</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {longData.correlation_matrix.map((item, idx) => (
+                  <TableRow key={idx} className="hover:bg-slate-50/80 transition">
+                    <TableCell className="font-bold text-slate-900">{item.label}</TableCell>
+                    <TableCell>
+                      <span className={`inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-bold ${
+                        item.impact.includes("Aggravating") ? "bg-red-100 text-red-700 border border-red-200" :
+                        item.impact.includes("Protective") ? "bg-emerald-100 text-emerald-800 border border-emerald-200" :
+                        "bg-slate-100 text-slate-700"
+                      }`}>
+                        {item.impact}
+                      </span>
+                    </TableCell>
+                    <TableCell className="font-mono font-semibold">{item.correlation_r > 0 ? `+${item.correlation_r}` : item.correlation_r}</TableCell>
+                    <TableCell className="font-mono text-xs text-slate-600">{item.p_value < 0.001 ? "< 0.001" : item.p_value}</TableCell>
+                    <TableCell className="font-mono">{item.mutual_info}</TableCell>
+                    <TableCell>
+                      {item.is_significant ? (
+                        <span className="text-emerald-700 font-bold text-xs flex items-center gap-1">
+                          <ShieldCheck className="h-4 w-4" /> Significant (p &lt; 0.05)
+                        </span>
+                      ) : (
+                        <span className="text-slate-400 text-xs">Not significant</span>
+                      )}
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
+        </SectionCard>
+      )}
 
       <div className="grid gap-4 md:grid-cols-3">
         {summary.map((item) => (

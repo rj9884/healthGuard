@@ -5,14 +5,17 @@ import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "sonner";
 
 import { createQueryClient } from "@/lib/query/query-client";
+import { AuthProvider } from "@/lib/auth";
 
 export function Providers({ children }: PropsWithChildren) {
   const [queryClient] = useState(() => createQueryClient());
 
   return (
     <QueryClientProvider client={queryClient}>
-      {children}
-      <Toaster richColors position="top-right" />
+      <AuthProvider>
+        {children}
+        <Toaster richColors position="top-right" />
+      </AuthProvider>
     </QueryClientProvider>
   );
 }
