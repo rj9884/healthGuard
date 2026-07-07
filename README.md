@@ -129,6 +129,12 @@ All results are persisted directly to database columns, allowing users to track 
 
 Follow these instructions to set up, build, and run HealthGuard on your local machine.
 
+> [!TIP]
+> **🚀 Instant Quick-Test Credentials**
+> Don't want to register a new account? When running locally or deployed, you can use our pre-seeded test credentials to log into a fully functional account immediately, or click **"Explore Guest Demo Mode"** on any auth screen:
+> - **Email**: `demo@healthguard.ai`
+> - **Password**: `demo1234`
+
 ### 1. Prerequisites
 - **Python 3.12** (Recommended. Note: Python 3.13/3.14 may lack prebuilt numba/llvmlite wheels required by SHAP).
 - **Node.js 18+** and **npm**
