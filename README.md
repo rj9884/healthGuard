@@ -1,5 +1,5 @@
 <p align="center">
-  <h1 align="center">🛡️ HealthGuard</h1>
+  <h1 align="center">HealthGuard</h1>
   <p align="center">
     <strong>Production-Ready AI Health Monitoring &amp; Longitudinal Clinical Triage</strong>
   </p>
@@ -39,7 +39,7 @@ HealthGuard is a production-grade, AI-powered health monitoring and longitudinal
 
 Unlike typical demos that rely on generic averages or 500MB+ vision transformers, HealthGuard implements a **lightweight, gradient-boosted tabular machine learning architecture** (`lightgbm`, `scikit-learn`, `shap`, `numpy`, `scipy`). It bridges daily consumer biometric check-ins with explainable clinical risk triage while maintaining a runtime RAM footprint under 80MB—guaranteeing 100% reliable deployments on Render and Railway free tiers.
 
-> **⚠️ Disclaimer:** HealthGuard is an educational, research, and self-awareness tracking tool. It does **not** constitute medical advice, definitive diagnosis, or emergency care.
+> **Disclaimer:** HealthGuard is an educational, research, and self-awareness tracking tool. It does **not** constitute medical advice, definitive diagnosis, or emergency care.
 
 ---
 
@@ -47,13 +47,13 @@ Unlike typical demos that rely on generic averages or 500MB+ vision transformers
 
 | Feature | Description |
 |---|---|
-| ** Explainable AI (SHAP) Triage** | Evaluates 15-class clinical disease risk using **LightGBM** decision trees, computing precise Shapley attribution percentages for every symptom check-in. |
-| ** Unsupervised Anomaly Detection** | Scans longitudinal vital signs (sleep, stress, hydration, temperature, heart rate) using an **Isolation Forest** to flag outlier health days before symptoms escalate. |
-| ** Longitudinal $p$-Value Matrix** | Performs Scipy hypothesis testing across user timelines, computing Pearson/Spearman correlation coefficients and **Mutual Information** scores to separate true lifestyle triggers from noise. |
-| ** ABCDE Skin Screener** | Gradient-boosted dermatological risk assessor evaluating lesion asymmetry, border irregularity, color variation, diameter, and evolution without vision transformer bloat. |
-| ** Real Authentication & Demo Mode** | Secure JWT authentication with bcrypt password hashing, plus a zero-friction **Guest Demo Mode** for immediate recruiter and user exploration. |
-| ** Interactive Biometric Sliders** | Anti-slop UI featuring responsive range sliders for sleep hours, stress levels, hydration liters, temperature, and heart rate. |
-| ** Doctor Report Generation** | Export structured PDF health summaries with longitudinal anomaly markers shareable directly with medical professionals. |
+| **Explainable AI (SHAP) Triage** | Evaluates 15-class clinical disease risk using **LightGBM** decision trees, computing precise Shapley attribution percentages for every symptom check-in. |
+| **Unsupervised Anomaly Detection** | Scans longitudinal vital signs (sleep, stress, hydration, temperature, heart rate) using an **Isolation Forest** to flag outlier health days before symptoms escalate. |
+| **Longitudinal $p$-Value Matrix** | Performs Scipy hypothesis testing across user timelines, computing Pearson/Spearman correlation coefficients and **Mutual Information** scores to separate true lifestyle triggers from noise. |
+| **ABCDE Skin Screener** | Gradient-boosted dermatological risk assessor evaluating lesion asymmetry, border irregularity, color variation, diameter, and evolution without vision transformer bloat. |
+| **Real Authentication & Demo Mode** | Secure JWT authentication with bcrypt password hashing, plus a zero-friction **Guest Demo Mode** for immediate recruiter and user exploration. |
+| **Interactive Biometric Sliders** | Clean, responsive UI featuring range sliders for sleep hours, stress levels, hydration liters, temperature, and heart rate. |
+| **Doctor Report Generation** | Export structured PDF health summaries with longitudinal anomaly markers shareable directly with medical professionals. |
 
 ---
 
@@ -67,20 +67,20 @@ All training and real-time inference run on custom gradient-boosted tabular pipe
 
 ```mermaid
 graph TB
-    subgraph Client["🖥️ Frontend — Next.js 15 (React 19 + Tailwind)"]
-        UI["Anti-Slop Zinc/Slate UI<br/>Interactive Biometric Sliders"]
+    subgraph Client["Frontend — Next.js 15 (React 19 + Tailwind)"]
+        UI["Clinical Zinc/Slate UI<br/>Interactive Biometric Sliders"]
         RQ["React Query<br/>State & Caching"]
         RC["Recharts & Tables<br/>p-Value & SHAP Rendering"]
     end
 
-    subgraph Server["⚙️ Backend — FastAPI (Python 3.12)"]
+    subgraph Server["Backend — FastAPI (Python 3.12)"]
         API["REST Endpoints<br/>/api/v1/*"]
         AUTH["JWT & Bcrypt Auth<br/>Guest Fallback Engine"]
         SVC["Symptom & Triage Services"]
         ML["ML Pipeline Layer<br/>LightGBM + SHAP + Isolation Forest"]
     end
 
-    subgraph Storage["💾 Storage"]
+    subgraph Storage["Storage"]
         DB[(SQLite / PostgreSQL<br/>symptom_logs table)]
         ART["Model Artifacts<br/>.joblib (< 1MB)"]
     end
@@ -130,7 +130,7 @@ All results are persisted directly to database columns, allowing users to track 
 Follow these instructions to set up, build, and run HealthGuard on your local machine.
 
 > [!TIP]
-> **🚀 Instant Quick-Test Credentials**
+> **Instant Quick-Test Credentials**
 > Don't want to register a new account? When running locally or deployed, you can use our pre-seeded test credentials to log into a fully functional account immediately, or click **"Explore Guest Demo Mode"** on any auth screen:
 > - **Email**: `demo@healthguard.ai`
 > - **Password**: `demo1234`
@@ -185,8 +185,8 @@ python -m app.ml.train_models
 uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 ```
 
-✅ Your backend API is now live at: **http://localhost:8000**
-✅ Interactive OpenAPI Swagger Docs: **http://localhost:8000/docs**
+Your backend API is now live at: **http://localhost:8000**
+Interactive OpenAPI Swagger Docs: **http://localhost:8000/docs**
 
 ---
 
@@ -205,7 +205,7 @@ npm install
 npm run dev
 ```
 
-✅ Your frontend web app is now live at: **http://localhost:3000**
+Your frontend web app is now live at: **http://localhost:3000**
 
 You can open **http://localhost:3000** in your browser, click **"Explore Guest Demo Mode"** or register an account, and start logging interactive biometric vitals!
 
