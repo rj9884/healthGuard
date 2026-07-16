@@ -1,5 +1,13 @@
 from fastapi.testclient import TestClient
 from app.main import app
+from app.core.auth import get_current_user
+from app.models.user import User
+
+# Override get_current_user to return a test user for routing tests
+def mock_get_current_user():
+    return User(id="test_user", name="Test User", email="test@healthguard.ai")
+
+app.dependency_overrides[get_current_user] = mock_get_current_user
 
 client = TestClient(app)
 

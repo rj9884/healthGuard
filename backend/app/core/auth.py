@@ -7,7 +7,6 @@ from fastapi.security import OAuth2PasswordBearer
 from sqlalchemy.orm import Session
 from app.models.database import get_db
 from app.models.user import User
-from app.core.demo_data import DEMO_USER_ID
 import os
 
 # Secret key for JWT signing
@@ -41,18 +40,13 @@ def create_access_token(data: dict, expires_delta: Optional[timedelta] = None) -
 def get_current_user(token: Optional[str] = Depends(oauth2_scheme), db: Session = Depends(get_db)) -> User:
     """
     Get current authenticated user from JWT token.
-    If no token or invalid token, falls back to DEMO_USER_ID so recruiters/guests
-    can explore the demo app without technical overhead.
     """
     if not token:
-        user = db.query(User).filter(User.id == DEMO_USER_ID).first()
-        if not user:
-            # Create default user if not exists
-            user = User(id=DEMO_USER_ID, name="Guest Demo User", email="guest@healthguard.ai")
-            db.add(user)
-            db.commit()
-            db.refresh(user)
-        return user
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Not authenticated. Please log in.",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
 
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])

@@ -4,7 +4,7 @@ from sqlalchemy.orm import Session
 
 from app.api.deps import get_current_user_id
 from app.models.database import get_db
-from app.services.analysis_service import build_report, get_patterns, get_summary, load_demo_data
+from app.services.analysis_service import build_report, get_patterns, get_summary
 from app.core.pattern_engine import get_longitudinal_analysis
 
 router = APIRouter()
@@ -49,8 +49,3 @@ def report(
         media_type="application/pdf",
         headers={"Content-Disposition": "attachment; filename=health_report.pdf"},
     )
-
-
-@router.post("/demo-data")
-def demo_data(reset: bool = False, db: Session = Depends(get_db)):
-    return load_demo_data(db, reset=reset)

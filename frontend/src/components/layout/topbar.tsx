@@ -20,22 +20,20 @@ function initialsOf(name: string): string {
 }
 
 export function Topbar() {
-  const { user, isGuest, logout } = useAuth();
+  const { user, logout } = useAuth();
   const { members, activeMember, setActiveMember } = useFamily();
   const router = useRouter();
   const [memberDropdownOpen, setMemberDropdownOpen] = useState(false);
   const [accountDropdownOpen, setAccountDropdownOpen] = useState(false);
 
-  // Works for both real accounts and guest demo mode: clears whatever
-  // session state exists (token or guest flag) and returns to the
-  // marketing page.
+  // Clears session state and returns to the marketing page.
   const handleExit = () => {
     setAccountDropdownOpen(false);
     logout();
     router.push("/");
   };
 
-  const displayName = isGuest ? "Guest Demo User" : user?.name ?? "Account";
+  const displayName = user?.name ?? "Account";
 
   return (
     <header className="flex items-center justify-between gap-4 border-b border-border bg-white px-6 py-3">
@@ -117,7 +115,7 @@ export function Topbar() {
               <div className="border-b border-border px-3.5 py-3">
                 <p className="text-sm font-semibold text-foreground">{displayName}</p>
                 <p className="mt-0.5 truncate text-xs text-muted-foreground">
-                  {isGuest ? "Guest demo mode — data isn't saved" : user?.email}
+                  {user?.email}
                 </p>
               </div>
 
@@ -129,22 +127,12 @@ export function Topbar() {
                 <Users className="h-4 w-4 text-muted-foreground" /> Manage family profiles
               </Link>
 
-              {isGuest && (
-                <Link
-                  href="/register"
-                  onClick={() => setAccountDropdownOpen(false)}
-                  className="flex w-full items-center gap-2.5 border-t border-border px-3.5 py-2.5 text-sm font-semibold text-primary transition hover:bg-accent"
-                >
-                  <UserCog className="h-4 w-4" /> Create an account
-                </Link>
-              )}
-
               <button
                 onClick={handleExit}
                 className="flex w-full items-center gap-2.5 border-t border-border px-3.5 py-2.5 text-left text-sm font-semibold text-red-600 transition hover:bg-red-50"
               >
-                {isGuest ? <Home className="h-4 w-4" /> : <LogOut className="h-4 w-4" />}
-                {isGuest ? "Exit demo & back to home" : "Sign out"}
+                <LogOut className="h-4 w-4" />
+                Sign out
               </button>
             </div>
           )}

@@ -11,28 +11,6 @@ from app.models import chat as chat_model  # noqa: F401
 
 Base.metadata.create_all(bind=engine)
 
-def seed_test_credentials():
-    db = SessionLocal()
-    try:
-        test_email = "demo@healthguard.ai"
-        existing = db.query(User).filter(User.email == test_email).first()
-        if not existing:
-            demo_user = User(
-                id="test_demo_user_id",
-                email=test_email,
-                hashed_password=get_password_hash("demo1234"),
-                name="Alex Rivera (Test Demo)",
-                age_range="adult"
-            )
-            db.add(demo_user)
-            db.commit()
-    except Exception as e:
-        print(f"Note: Could not seed test user: {e}")
-    finally:
-        db.close()
-
-seed_test_credentials()
-
 app = FastAPI(title="HealthGuard API", version="2.0.0")
 
 

@@ -16,7 +16,7 @@ export default function RegisterPage() {
   const [password, setPassword] = useState("");
   const [ageRange, setAgeRange] = useState("adult");
   const [loading, setLoading]   = useState(false);
-  const { register, enableGuestDemo } = useAuth();
+  const { register } = useAuth();
   const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -79,19 +79,6 @@ export default function RegisterPage() {
             {loading ? "Creating…" : "Create account"} <ArrowRight className="h-4 w-4" />
           </button>
         </form>
-
-        <div className="relative my-5">
-          <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-border" /></div>
-          <div className="relative flex justify-center"><span className="bg-white px-3 text-xs text-muted-foreground">or</span></div>
-        </div>
-
-        <button
-          type="button"
-          onClick={() => { enableGuestDemo(); router.push("/dashboard"); }}
-          className="flex w-full items-center justify-center rounded-lg border border-border bg-white px-4 py-2.5 text-sm font-medium text-foreground shadow-sm transition hover:bg-muted"
-        >
-          Continue as guest
-        </button>
 
         <p className="mt-6 text-center text-sm text-muted-foreground">
           Have an account?{" "}

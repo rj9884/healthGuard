@@ -15,7 +15,7 @@ def _make_mock_log(symptom, severity, triggers, ts=None):
 
 
 def test_analyze_patterns_insufficient_data():
-    """Should return a message when fewer than 5 entries exist."""
+    """Should return a message when fewer than 3 entries exist."""
     from app.core.pattern_engine import analyze_patterns
 
     db = MagicMock()
@@ -25,7 +25,7 @@ def test_analyze_patterns_insufficient_data():
 
     result = analyze_patterns(db, "test_user", "headache")
     assert "message" in result
-    assert "5 entries" in result["message"]
+    assert "3 health check-ins" in result["message"]
 
 
 def test_analyze_patterns_with_data():

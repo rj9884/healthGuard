@@ -2,7 +2,6 @@
 
 import React from "react";
 import Link from "next/link";
-import { useAuth } from "@/lib/auth";
 import { useRouter } from "next/navigation";
 import {
   HeartPulse,
@@ -15,13 +14,7 @@ import {
 } from "lucide-react";
 
 export default function LandingPage() {
-  const { enableGuestDemo } = useAuth();
   const router = useRouter();
-
-  const handleDemoClick = () => {
-    enableGuestDemo();
-    router.push("/dashboard");
-  };
 
   return (
     <div className="flex min-h-[100dvh] flex-col bg-background font-sans text-foreground">
@@ -79,13 +72,6 @@ export default function LandingPage() {
             >
               Start Health Triage <ArrowRight className="h-5 w-5" />
             </Link>
-
-            <button
-              onClick={handleDemoClick}
-              className="inline-flex w-full items-center justify-center gap-2 whitespace-nowrap rounded-lg border border-border bg-white px-8 py-4 text-base font-semibold text-foreground transition hover:bg-muted sm:w-auto"
-            >
-              Explore Live Demo
-            </button>
           </div>
 
           <div className="mt-12 flex flex-wrap items-center justify-center gap-x-8 gap-y-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
@@ -168,12 +154,6 @@ export default function LandingPage() {
               >
                 Create Your Account
               </Link>
-              <button
-                onClick={handleDemoClick}
-                className="inline-flex w-full items-center justify-center whitespace-nowrap rounded-lg border border-white/30 bg-transparent px-8 py-3.5 text-sm font-semibold text-white transition hover:bg-white/10 sm:w-auto"
-              >
-                Try Guest Demo
-              </button>
             </div>
           </div>
         </div>
