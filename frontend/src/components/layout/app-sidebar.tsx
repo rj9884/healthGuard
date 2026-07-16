@@ -14,8 +14,8 @@ export function AppSidebar() {
     <aside className="sticky top-0 hidden h-screen w-64 shrink-0 flex-col border-r border-border bg-white xl:flex">
       {/* Logo */}
       <div className="flex items-center gap-3 border-b border-border px-6 py-5">
-        <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary text-white">
-          <Heart className="h-4 w-4" />
+        <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary text-white overflow-hidden p-1.5">
+          <img src="/icon0.svg" alt="HealthGuard Logo" className="h-full w-full object-contain" />
         </div>
         <div>
           <p className="text-[11px] font-semibold uppercase tracking-widest text-muted-foreground">

@@ -38,8 +38,8 @@ export default function RegisterPage() {
     <div className="flex min-h-[100dvh] flex-col items-center justify-center bg-background px-6 py-12">
       {/* Logo */}
       <Link href="/" className="mb-8 flex items-center gap-2">
-        <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary text-white">
-          <Heart className="h-4 w-4" />
+        <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary text-white overflow-hidden p-1.5">
+          <img src="/icon0.svg" alt="HealthGuard Logo" className="h-full w-full object-contain" />
         </div>
         <span className="text-lg font-bold text-foreground">HealthGuard</span>
       </Link>

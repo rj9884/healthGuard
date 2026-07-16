@@ -40,8 +40,8 @@ export default function LoginPage() {
       <div className="hidden lg:flex lg:w-[480px] lg:shrink-0 lg:flex-col lg:justify-between lg:border-r lg:border-border lg:bg-white lg:px-12 lg:py-16">
         <div>
           <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary text-white">
-              <Heart className="h-5 w-5" />
+            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary text-white overflow-hidden p-1.5">
+              <img src="/icon0.svg" alt="HealthGuard Logo" className="h-full w-full object-contain" />
             </div>
             <span className="text-xl font-bold text-foreground">HealthGuard</span>
           </div>
@@ -71,8 +71,8 @@ export default function LoginPage() {
       <div className="flex flex-1 flex-col items-center justify-center px-6 py-12">
         {/* Mobile logo */}
         <div className="mb-10 flex items-center gap-2 lg:hidden">
-          <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary text-white">
-            <Heart className="h-4 w-4" />
+          <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary text-white overflow-hidden p-1.5">
+            <img src="/icon0.svg" alt="HealthGuard Logo" className="h-full w-full object-contain" />
           </div>
           <span className="text-lg font-bold text-foreground">HealthGuard</span>
         </div>
