@@ -4,9 +4,7 @@ import React from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
-  HeartPulse,
   ShieldAlert,
-  Sparkles,
   Cpu,
   LineChart,
   ArrowRight,
@@ -22,12 +20,12 @@ export default function LandingPage() {
       <header className="sticky top-0 z-50 border-b border-border bg-white px-6 py-4">
         <div className="mx-auto flex max-w-7xl items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary text-white">
-              <HeartPulse className="h-6 w-6" />
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary text-white overflow-hidden p-1.5">
+              <img src="/icon0.svg" alt="HealthGuard Logo" className="h-full w-full object-contain" />
             </div>
             <div>
               <span className="text-xs font-bold uppercase tracking-widest text-primary">Clinical AI</span>
-              <h1 className="font-display text-xl font-bold tracking-tight text-foreground">HealthGuard</h1>
+              <span className="font-display text-xl font-bold tracking-tight text-foreground block">HealthGuard</span>
             </div>
           </div>
 
@@ -48,15 +46,11 @@ export default function LandingPage() {
         </div>
       </header>
 
-      {/* Hero Section */}
-      <section className="px-6 pb-24 pt-20 md:pb-32 md:pt-28">
-        <div className="mx-auto max-w-5xl text-center">
-          <div className="mb-8 inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/5 px-4 py-1.5 text-xs font-medium text-primary">
-            <Sparkles className="h-3.5 w-3.5" />
-            <span>Built for families, backed by real ML</span>
-          </div>
-
-          <h1 className="mb-8 font-display text-4xl font-extrabold leading-[1.1] tracking-tight text-foreground sm:text-6xl lg:text-7xl">
+      <main className="flex-1">
+        {/* Hero Section */}
+        <section className="px-6 pb-24 pt-20 md:pb-32 md:pt-28">
+          <div className="mx-auto max-w-5xl text-center">
+            <h1 className="mb-8 font-display text-4xl font-extrabold leading-[1.1] tracking-tight text-foreground sm:text-6xl lg:text-7xl">
             Family health tracking <br className="hidden sm:inline" />
             <span className="text-primary">that explains itself.</span>
           </h1>
@@ -158,12 +152,15 @@ export default function LandingPage() {
           </div>
         </div>
       </section>
+      </main>
 
       {/* Footer */}
       <footer className="mt-auto border-t border-border px-6 py-8 text-center text-xs text-muted-foreground">
         <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-4 sm:flex-row">
           <div className="flex items-center gap-2">
-            <HeartPulse className="h-4 w-4 text-primary" />
+            <div className="flex h-6 w-6 items-center justify-center rounded bg-primary text-white overflow-hidden p-0.5">
+              <img src="/icon0.svg" alt="HealthGuard Logo" className="h-full w-full object-contain" />
+            </div>
             <span className="font-semibold text-foreground">HealthGuard AI-ML Engine</span>
           </div>
           <p>⚠️ For educational and research purposes only. Does not constitute medical advice or definitive diagnosis.</p>
