@@ -1,0 +1,37 @@
+{
+  "5": {
+    "mean_latency_ms": 188.64682679992256,
+    "p50_latency_ms": 179.93222149925714,
+    "p95_latency_ms": 238.97329474993964,
+    "p99_latency_ms": 256.2688641294517,
+    "iterations_tested": 50
+  },
+  "20": {
+    "mean_latency_ms": 161.7924447599944,
+    "p50_latency_ms": 160.9229494997635,
+    "p95_latency_ms": 167.02172710083687,
+    "p99_latency_ms": 176.3069246602936,
+    "iterations_tested": 50
+  },
+  "100": {
+    "mean_latency_ms": 168.49299060002522,
+    "p50_latency_ms": 167.69792800005234,
+    "p95_latency_ms": 172.54156710014286,
+    "p99_latency_ms": 178.24721289967783,
+    "iterations_tested": 50
+  },
+  "500": {
+    "mean_latency_ms": 208.59910681992915,
+    "p50_latency_ms": 201.88223350032786,
+    "p95_latency_ms": 242.83516125087766,
+    "p99_latency_ms": 260.65986323976176,
+    "iterations_tested": 50
+  },
+  "2000": {
+    "mean_latency_ms": 288.45807690013316,
+    "p50_latency_ms": 288.63192700009677,
+    "p95_latency_ms": 295.0367572004325,
+    "p99_latency_ms": 296.3769522399525,
+    "iterations_tested": 10
+  }
+}

@@ -1,0 +1,40 @@
+{
+  "disease_classification": {
+    "accuracy": 1.0,
+    "precision": 1.0,
+    "recall": 1.0,
+    "f1_score": 1.0
+  },
+  "triage_level_classification": {
+    "accuracy": 0.28555555555555556,
+    "precision": 0.28583200833379024,
+    "recall": 0.28555555555555556,
+    "f1_score": 0.28569318929161086
+  },
+  "skin_lesion_classification": {
+    "accuracy": 0.8133333333333334,
+    "precision": 0.8099281834973672,
+    "recall": 0.8133333333333334,
+    "f1_score": 0.8073439023837065
+  },
+  "latency_ms": {
+    "clinical_triage_inference": {
+      "mean": 4.063685920082207,
+      "p50": 3.869479500281159,
+      "p95": 5.8295167490541635,
+      "p99": 8.236719910619286
+    },
+    "shap_explanation_generation": {
+      "mean": 61.82864006683909,
+      "p50": 14.008998500685266,
+      "p95": 14.697068049918016,
+      "p99": 1031.8086289799624
+    },
+    "skin_screener_inference": {
+      "mean": 1.8943750200742215,
+      "p50": 1.8097510001098271,
+      "p95": 2.546616601284768,
+      "p99": 2.6737525395037682
+    }
+  }
+}

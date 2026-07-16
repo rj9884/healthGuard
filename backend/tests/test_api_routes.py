@@ -1,13 +1,42 @@
+import pytest
 from fastapi.testclient import TestClient
 from app.main import app
 from app.core.auth import get_current_user
 from app.models.user import User
+from app.models.database import SessionLocal
+from app.models.symptom import SymptomLog
+from app.models.medication import Medication
 
 # Override get_current_user to return a test user for routing tests
 def mock_get_current_user():
     return User(id="test_user", name="Test User", email="test@healthguard.ai")
 
 app.dependency_overrides[get_current_user] = mock_get_current_user
+
+@pytest.fixture(scope="module", autouse=True)
+def setup_test_user():
+    db = SessionLocal()
+    user = db.query(User).filter(User.id == "test_user").first()
+    if not user:
+        user = User(
+            id="test_user",
+            email="test@healthguard.ai",
+            name="Test User",
+            full_name="Test User",
+            age_range="adult",
+            sex="male"
+        )
+        db.add(user)
+        db.commit()
+    yield
+    db = SessionLocal()
+    # Clean up test_user's data
+    db.query(SymptomLog).filter(SymptomLog.user_id == "test_user").delete()
+    db.query(Medication).filter(Medication.user_id == "test_user").delete()
+    db.query(User).filter(User.id == "test_user").delete()
+    db.commit()
+    db.close()
+
 
 client = TestClient(app)
 
