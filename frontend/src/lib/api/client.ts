@@ -41,6 +41,16 @@ export async function fetchJson<T>(
       ...(body ? { body: JSON.stringify(body) } : {}),
     });
 
+    if (response.status === 401 && path !== "/auth/login" && path !== "/auth/register") {
+      if (typeof window !== "undefined") {
+        localStorage.removeItem("hg_access_token");
+        if (window.location.pathname !== "/login" && window.location.pathname !== "/register" && window.location.pathname !== "/") {
+          window.location.href = "/login";
+        }
+      }
+      throw new Error("Session expired. Please log in again.");
+    }
+
     if (!response.ok) {
       const err = await response.json().catch(() => ({ detail: "Request failed" }));
       throw new Error(err.detail || "Request failed");
@@ -68,6 +78,16 @@ export async function postJson<TResponse, TPayload>(
     body: JSON.stringify(payload),
   });
 
+  if (response.status === 401 && path !== "/auth/login" && path !== "/auth/register") {
+    if (typeof window !== "undefined") {
+      localStorage.removeItem("hg_access_token");
+      if (window.location.pathname !== "/login" && window.location.pathname !== "/register" && window.location.pathname !== "/") {
+        window.location.href = "/login";
+      }
+    }
+    throw new Error("Session expired. Please log in again.");
+  }
+
   if (!response.ok) {
     const err = await response.json().catch(() => ({ detail: "Request failed" }));
     throw new Error(err.detail || "Request failed");
@@ -81,6 +101,16 @@ export async function deleteJson(path: string): Promise<void> {
     method: "DELETE",
     headers: getAuthHeaders(),
   });
+
+  if (response.status === 401 && path !== "/auth/login" && path !== "/auth/register") {
+    if (typeof window !== "undefined") {
+      localStorage.removeItem("hg_access_token");
+      if (window.location.pathname !== "/login" && window.location.pathname !== "/register" && window.location.pathname !== "/") {
+        window.location.href = "/login";
+      }
+    }
+    throw new Error("Session expired. Please log in again.");
+  }
 
   if (!response.ok) {
     throw new Error("Delete failed");
@@ -96,6 +126,16 @@ export async function postFormData<TResponse>(
     headers: getAuthHeaders(),
     body: payload,
   });
+
+  if (response.status === 401 && path !== "/auth/login" && path !== "/auth/register") {
+    if (typeof window !== "undefined") {
+      localStorage.removeItem("hg_access_token");
+      if (window.location.pathname !== "/login" && window.location.pathname !== "/register" && window.location.pathname !== "/") {
+        window.location.href = "/login";
+      }
+    }
+    throw new Error("Session expired. Please log in again.");
+  }
 
   if (!response.ok) {
     const err = await response.json().catch(() => ({ detail: "Upload failed" }));
