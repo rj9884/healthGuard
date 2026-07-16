@@ -1,3 +1,6 @@
+<img width="2880" height="1500" alt="landing" src="https://github.com/user-attachments/assets/038329ae-3e78-43bb-9159-2b09f8628110" />
+
+---
 # HealthGuard
 
 HealthGuard is a family health-tracking app that gives every check-in a clear, explainable risk assessment instead of a black-box score. One account supports multiple family member profiles, each with its own symptom history, medication list, and longitudinal pattern analysis.
@@ -134,6 +137,12 @@ Execution time as a member's historical log count grows from 5 to 2,000 entries:
 ### Concurrency & Identified Bottleneck
 
 Concurrent load testing on `POST /api/v1/symptoms` (concurrency levels 1 to 20) surfaced a p95 latency of 13.5 seconds at 20 concurrent requests. Request-stage instrumentation traced this to the Isolation Forest anomaly engine holding the Python GIL under CPU-bound load, not outbound network calls to openFDA as originally suspected. Planned remedies: running Uvicorn with multiple worker processes, and offloading anomaly detection to a `ProcessPoolExecutor`. Full breakdown, including the openFDA caching effect, is in [`benchmarks/results/summary.md`](benchmarks/results/summary.md).
+
+<img width="1840" height="1730" alt="bench-01" src="https://github.com/user-attachments/assets/1de6ee34-7926-42f2-b4e8-86bfd02092df" />
+
+<img width="1930" height="1728" alt="bench-02" src="https://github.com/user-attachments/assets/f62eb89b-2d71-4599-a504-70a7be0b7947" />
+
+
 
 ### Dataset Note
 
