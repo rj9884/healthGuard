@@ -48,8 +48,10 @@ async def authenticate_client(client: httpx.AsyncClient) -> str:
     # Fallback to empty token
     return ""
 
-async def test_endpoint(client: httpx.AsyncClient, name: str, method: str, path: str, payload: dict = None) -> float:
+async def test_endpoint(client: httpx.AsyncClient, name: str, method: str, path: str, payload: dict = None) -> tuple:
     t0 = time.perf_counter()
+    debug_metrics = None
+    success = False
     try:
         if method == "GET":
             resp = await client.get(f"{BASE_URL}{path}")
@@ -57,14 +59,20 @@ async def test_endpoint(client: httpx.AsyncClient, name: str, method: str, path:
             resp = await client.post(f"{BASE_URL}{path}", json=payload)
         
         status_code = resp.status_code
-        # Success if 200 or 201
         success = (status_code in [200, 201])
-    except Exception as e:
+        if success:
+            try:
+                data = resp.json()
+                if isinstance(data, dict) and "debug_metrics" in data:
+                    debug_metrics = data["debug_metrics"]
+            except Exception:
+                pass
+    except Exception:
         success = False
         
     t1 = time.perf_counter()
     duration = (t1 - t0) * 1000 # ms
-    return duration if success else -1.0
+    return (duration if success else -1.0, debug_metrics)
 
 async def run_load_test(client: httpx.AsyncClient, name: str, method: str, path: str, payload: dict, concurrency: int, total_requests: int) -> dict:
     print(f"  Testing endpoint '{name}' (Concurrency={concurrency}, Total Requests={total_requests})...")
@@ -77,11 +85,40 @@ async def run_load_test(client: httpx.AsyncClient, name: str, method: str, path:
             
     tasks = [worker() for _ in range(total_requests)]
     t0 = time.perf_counter()
-    durations = await asyncio.gather(*tasks)
+    results = await asyncio.gather(*tasks)
     total_time = (time.perf_counter() - t0)
     
-    valid_durations = [d for d in durations if d > 0]
+    valid_durations = [r[0] for r in results if r[0] > 0]
     errors = total_requests - len(valid_durations)
+    
+    # Extract debug metrics
+    stage_metrics = {}
+    for r in results:
+        if r[0] > 0 and r[1] is not None:
+            for k, v in r[1].items():
+                if k not in stage_metrics:
+                    stage_metrics[k] = []
+                stage_metrics[k].append(v)
+                
+    stage_summaries = {}
+    for stage, vals in stage_metrics.items():
+        if vals:
+            stage_summaries[stage] = {
+                "mean_ms": float(np.mean(vals)),
+                "p50_ms": float(np.percentile(vals, 50)),
+                "p95_ms": float(np.percentile(vals, 95)),
+                "p99_ms": float(np.percentile(vals, 99)),
+                "sum": float(np.sum(vals))
+            }
+            
+    if stage_summaries:
+        print("    Stage timing breakdown (mean / p95):")
+        for stage, summary in stage_summaries.items():
+            if "ms" in stage or "total" in stage or "inference" in stage or "reads" in stage or "writes" in stage:
+                print(f"      - {stage}: {summary['mean_ms']:.2f} ms / {summary['p95_ms']:.2f} ms")
+            else:
+                # Count metric like cache hits/misses
+                print(f"      - {stage}: total {summary['sum']:.0f} (avg {summary['mean_ms']:.2f})")
     
     if not valid_durations:
         return {
@@ -90,7 +127,8 @@ async def run_load_test(client: httpx.AsyncClient, name: str, method: str, path:
             "p50_ms": 0.0,
             "p95_ms": 0.0,
             "p99_ms": 0.0,
-            "error_rate": 1.0
+            "error_rate": 1.0,
+            "stage_breakdown": {}
         }
         
     rps = len(valid_durations) / total_time
@@ -101,7 +139,8 @@ async def run_load_test(client: httpx.AsyncClient, name: str, method: str, path:
         "p50_ms": float(np.percentile(valid_durations, 50)),
         "p95_ms": float(np.percentile(valid_durations, 95)),
         "p99_ms": float(np.percentile(valid_durations, 99)),
-        "error_rate": float(errors / total_requests)
+        "error_rate": float(errors / total_requests),
+        "stage_breakdown": stage_summaries
     }
 
 async def main():

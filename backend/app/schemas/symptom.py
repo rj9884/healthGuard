@@ -55,3 +55,4 @@ class CareRecommendation(BaseModel):
 
 class SymptomCreateResponse(SymptomResponse):
     care_recommendation: Optional[CareRecommendation] = None
+    debug_metrics: Optional[dict] = None

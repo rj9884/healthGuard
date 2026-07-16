@@ -24,7 +24,7 @@ def run_ml_benchmark():
     
     # Train / Test split
     X_train, X_test, y_train_disease, y_test_disease = get_train_test_splits("disease_category", test_size=0.2, random_state=42)
-    _, _, y_train_triage, y_test_triage = get_train_test_splits("triage_level", test_size=0.2, random_state=42)
+    y_test_triage = df.loc[X_test.index, "triage_level"]
     
     # Ensure models are trained
     triage_classifier._ensure_models_loaded()
@@ -42,6 +42,11 @@ def run_ml_benchmark():
     t_prec, t_rec, t_f1, _ = precision_recall_fscore_support(y_test_triage, triage_preds, average='weighted')
     
     print(f"Triage Level Accuracy: {triage_acc:.4f} (Weighted F1: {t_f1:.4f})")
+    
+    from sklearn.metrics import confusion_matrix
+    print("\nTriage Classifier Confusion Matrix:")
+    print(confusion_matrix(y_test_triage, triage_preds, labels=triage_classifier.triage_classes))
+    print(f"Classes: {triage_classifier.triage_classes}\n")
     
     # 2. Evaluate Skin Lesion Screener (uses internal synthetic dataset of 1500 profiles)
     skin_screener._ensure_model_loaded()

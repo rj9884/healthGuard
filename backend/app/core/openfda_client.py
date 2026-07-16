@@ -11,8 +11,23 @@ has no label on file, we degrade gracefully and just return the WHO
 guidance without enrichment rather than failing the request.
 """
 import httpx
+import contextvars
+import time
 
 OPENFDA_LABEL_URL = "https://api.fda.gov/drug/label.json"
+
+# ContextVar to track request-specific timings and cache counts
+request_metrics = contextvars.ContextVar("request_metrics", default=None)
+
+def record_metric(key: str, value: float):
+    metrics = request_metrics.get()
+    if metrics is not None:
+        metrics[key] = metrics.get(key, 0.0) + value
+
+def increment_metric(key: str):
+    metrics = request_metrics.get()
+    if metrics is not None:
+        metrics[key] = metrics.get(key, 0) + 1
 
 # Tiny in-process cache so repeated symptom check-ins for the same
 # medication don't re-hit the network every time.
@@ -35,8 +50,12 @@ def fetch_label_enrichment(generic_name: str, timeout_seconds: float = 3.0) -> d
     silently to the static WHO guidance."""
     key = generic_name.lower().strip()
     if key in _cache:
+        increment_metric("openfda_cache_hits")
         return _cache[key]
 
+    increment_metric("openfda_cache_misses")
+    
+    t0 = time.perf_counter()
     params = {
         "search": f'openfda.generic_name:"{key}"',
         "limit": 1,
@@ -44,6 +63,9 @@ def fetch_label_enrichment(generic_name: str, timeout_seconds: float = 3.0) -> d
     try:
         with httpx.Client(timeout=timeout_seconds) as client:
             response = client.get(OPENFDA_LABEL_URL, params=params)
+            duration_ms = (time.perf_counter() - t0) * 1000
+            record_metric("openfda_network_ms", duration_ms)
+            
             if response.status_code != 200:
                 _cache[key] = None
                 return None
@@ -62,5 +84,7 @@ def fetch_label_enrichment(generic_name: str, timeout_seconds: float = 3.0) -> d
             _cache[key] = enrichment
             return enrichment
     except Exception:
+        duration_ms = (time.perf_counter() - t0) * 1000
+        record_metric("openfda_network_ms", duration_ms)
         _cache[key] = None
         return None
