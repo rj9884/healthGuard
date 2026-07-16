@@ -12,27 +12,30 @@ router = APIRouter()
 
 @router.get("/summary")
 def summary(
+    member_id: str | None = None,
     db: Session = Depends(get_db),
     user_id: str = Depends(get_current_user_id),
 ):
-    return get_summary(db, user_id=user_id)
+    return get_summary(db, user_id=user_id, member_id=member_id)
 
 
 @router.get("/longitudinal")
 def longitudinal(
+    member_id: str | None = None,
     db: Session = Depends(get_db),
     user_id: str = Depends(get_current_user_id),
 ):
-    return get_longitudinal_analysis(db, user_id=user_id)
+    return get_longitudinal_analysis(db, user_id=user_id, member_id=member_id)
 
 
 @router.get("/patterns/{symptom}")
 def patterns(
     symptom: str,
+    member_id: str | None = None,
     db: Session = Depends(get_db),
     user_id: str = Depends(get_current_user_id),
 ):
-    return get_patterns(db, user_id=user_id, symptom=symptom)
+    return get_patterns(db, user_id=user_id, symptom=symptom, member_id=member_id)
 
 
 @router.get("/report")

@@ -7,6 +7,7 @@ def create_symptom(
     db: Session,
     *,
     user_id: str,
+    member_id: str | None = None,
     symptom: str,
     severity: int,
     duration_hr: float | None,
@@ -26,6 +27,7 @@ def create_symptom(
 ) -> SymptomLog:
     entry = SymptomLog(
         user_id=user_id,
+        member_id=member_id,
         symptom=symptom.lower().strip(),
         severity=severity,
         duration_hr=duration_hr,
@@ -49,20 +51,15 @@ def create_symptom(
     return entry
 
 
-def list_recent_symptoms(db: Session, *, user_id: str, limit: int = 50) -> list[SymptomLog]:
-    return (
-        db.query(SymptomLog)
-        .filter(SymptomLog.user_id == user_id)
-        .order_by(SymptomLog.timestamp.desc())
-        .limit(limit)
-        .all()
-    )
+def list_recent_symptoms(db: Session, *, user_id: str, member_id: str | None = None, limit: int = 50) -> list[SymptomLog]:
+    query = db.query(SymptomLog).filter(SymptomLog.user_id == user_id)
+    if member_id:
+        query = query.filter(SymptomLog.member_id == member_id)
+    return query.order_by(SymptomLog.timestamp.desc()).limit(limit).all()
 
 
-def list_all_symptoms(db: Session, *, user_id: str) -> list[SymptomLog]:
-    return (
-        db.query(SymptomLog)
-        .filter(SymptomLog.user_id == user_id)
-        .order_by(SymptomLog.timestamp.desc())
-        .all()
-    )
+def list_all_symptoms(db: Session, *, user_id: str, member_id: str | None = None) -> list[SymptomLog]:
+    query = db.query(SymptomLog).filter(SymptomLog.user_id == user_id)
+    if member_id:
+        query = query.filter(SymptomLog.member_id == member_id)
+    return query.order_by(SymptomLog.timestamp.desc()).all()

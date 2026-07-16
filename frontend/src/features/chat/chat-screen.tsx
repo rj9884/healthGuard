@@ -3,13 +3,13 @@
 import { useState } from "react";
 import { MessageSquare, SendHorizonal } from "lucide-react";
 
-import { PageHeader } from "@/components/layout/page-header";
 import { EmptyState } from "@/components/shared/empty-state";
 import { SectionCard } from "@/components/shared/section-card";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { askHealthAi } from "@/lib/api/healthguard";
 import { toast } from "sonner";
+import { cn } from "@/lib/utils/cn";
 
 type ChatMessage = {
   role: "user" | "assistant";
@@ -50,19 +50,20 @@ export function ChatScreen() {
   }
 
   return (
-    <div className="space-y-8">
-      <PageHeader
-        eyebrow="AI Companion"
-        title="Ask follow-up questions with recent health history already in context"
-        description="The assistant page is designed like a real product surface, with a dedicated conversation panel and a clear clinical-support framing."
-      />
+    <div className="space-y-6">
+      <div>
+        <h1 className="text-xl font-bold text-foreground">AI Companion</h1>
+        <p className="mt-1 text-sm text-muted-foreground">
+          Ask follow-up questions with your recent health history in context.
+        </p>
+      </div>
 
       <div className="grid gap-6 xl:grid-cols-[0.8fr,1.2fr]">
         <SectionCard
           title="Suggested prompts"
           description="Good starting points for health literacy and appointment prep."
         >
-          <div className="space-y-3 text-sm text-muted-foreground">
+          <div className="space-y-2.5 text-sm text-muted-foreground">
             <p>What patterns should I monitor in recurring headaches?</p>
             <p>How should I summarize the last week of fatigue for a doctor?</p>
             <p>Which details should I log next to improve pattern analysis?</p>
@@ -85,19 +86,24 @@ export function ChatScreen() {
                 {messages.map((message, index) => (
                   <div
                     key={`${message.role}-${index}`}
-                    className={`rounded-3xl px-4 py-4 text-sm leading-6 ${
-                      message.role === "assistant"
-                        ? "bg-primary/10 text-foreground"
-                        : "bg-slate-900 text-slate-50"
-                    }`}
+                    className={cn("flex", message.role === "user" ? "justify-end" : "justify-start")}
                   >
-                    {message.content}
+                    <div
+                      className={cn(
+                        "max-w-[85%] rounded-lg px-4 py-3 text-sm leading-6",
+                        message.role === "user"
+                          ? "bg-primary text-white"
+                          : "border border-border bg-white text-foreground",
+                      )}
+                    >
+                      {message.content}
+                    </div>
                   </div>
                 ))}
               </div>
             )}
 
-            <div className="space-y-3 rounded-3xl border border-border bg-muted/50 p-4">
+            <div className="space-y-3 rounded-lg border border-border bg-muted/40 p-4">
               <Textarea
                 placeholder="Describe symptoms or ask a health question..."
                 value={prompt}

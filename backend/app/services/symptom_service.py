@@ -1,8 +1,10 @@
 from sqlalchemy.orm import Session
 from app.repositories.symptom_repository import create_symptom, list_recent_symptoms, list_all_symptoms
+from app.repositories.family_member_repository import get_family_member
 from app.schemas.symptom import SymptomCreate
 from app.ml.triage_model import triage_classifier
 from app.ml.anomaly_detector import detect_anomalies_and_correlations
+from app.services.medication_suggestion_service import get_care_recommendation
 
 
 def create_symptom_entry(db: Session, *, user_id: str, payload: SymptomCreate):
@@ -29,8 +31,8 @@ def create_symptom_entry(db: Session, *, user_id: str, payload: SymptomCreate):
     # 1. Run LightGBM Triage Classifier & SHAP Explainer
     ml_triage_result = triage_classifier.predict(symptoms_dict, vitals_dict)
 
-    # 2. Fetch past logs for Anomaly Detection
-    past_logs = list_all_symptoms(db, user_id=user_id)
+    # 2. Fetch past logs for Anomaly Detection (scoped to this family member if provided)
+    past_logs = list_all_symptoms(db, user_id=user_id, member_id=payload.member_id)
     
     # Create a temporary mock object representing this new log for anomaly scoring
     class MockLog:
@@ -51,9 +53,10 @@ def create_symptom_entry(db: Session, *, user_id: str, payload: SymptomCreate):
     is_anom = 1 if anomaly_result.get("recent_anomaly_detected") else 0
     anom_reason = anomaly_result.get("anomaly_alert_message")
 
-    return create_symptom(
+    saved_entry = create_symptom(
         db,
         user_id=user_id,
+        member_id=payload.member_id,
         symptom=payload.symptom,
         severity=payload.severity,
         duration_hr=payload.duration_hr,
@@ -72,6 +75,21 @@ def create_symptom_entry(db: Session, *, user_id: str, payload: SymptomCreate):
         anomaly_reason=anom_reason,
     )
 
+    # 3. Turn the ML prediction into a WHO-grounded care recommendation for this member
+    member = get_family_member(db, member_id=payload.member_id) if payload.member_id else None
+    care_recommendation = get_care_recommendation(
+        disease_category=ml_triage_result.get("predicted_disease_category"),
+        triage_level=ml_triage_result.get("triage_level"),
+        severity=payload.severity,
+        member_name=member.name if member else None,
+        age_range=member.age_range if member else None,
+    )
 
-def get_recent_symptoms(db: Session, *, user_id: str, limit: int = 50):
-    return list_recent_symptoms(db, user_id=user_id, limit=limit)
+    # Attach as a plain attribute so the API layer can surface it without
+    # changing the stored ORM row.
+    saved_entry.care_recommendation = care_recommendation
+    return saved_entry
+
+
+def get_recent_symptoms(db: Session, *, user_id: str, member_id: str | None = None, limit: int = 50):
+    return list_recent_symptoms(db, user_id=user_id, member_id=member_id, limit=limit)

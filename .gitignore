@@ -18,3 +18,7 @@ generate_report.py
 report_instruction.md
 GEMINI.md
 AGENTS.md
+.mcp-backup/
+.mcp-backups/
+*.tsbuildinfo
+backend/data/ddxplus/*.csv

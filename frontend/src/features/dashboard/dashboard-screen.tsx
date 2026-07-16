@@ -1,7 +1,8 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-import { ArrowUpRight, FileDown, Sparkles, ShieldAlert, Cpu, HeartPulse, CheckCircle2 } from "lucide-react";
+import { useState } from "react";
+import { ArrowUpRight, FileDown, Sparkles, ShieldAlert, X } from "lucide-react";
 import {
   Area,
   AreaChart,
@@ -14,116 +15,96 @@ import {
   YAxis,
 } from "recharts";
 
-import { PageHeader } from "@/components/layout/page-header";
 import { SectionCard } from "@/components/shared/section-card";
-import { SeverityBadge } from "@/components/shared/severity-badge";
+import { SeverityBadge, TriageBadge } from "@/components/shared/severity-badge";
 import { StatCard } from "@/components/shared/stat-card";
-import { Badge } from "@/components/ui/badge";
+import { MemberAvatar } from "@/components/shared/member-avatar";
 import { Button } from "@/components/ui/button";
 import { getDashboard, getReport, getLongitudinalAnalysis } from "@/lib/api/healthguard";
 import { USE_MOCK_DATA } from "@/lib/api/client";
+import { useFamily } from "@/lib/family";
+import { RELATION_LABELS } from "@/lib/api/types";
 
 export function DashboardScreen() {
+  const { activeMember } = useFamily();
+  const [bannerDismissed, setBannerDismissed] = useState(false);
+
   const { data } = useQuery({
-    queryKey: ["dashboard"],
-    queryFn: getDashboard,
+    queryKey: ["dashboard", activeMember?.id],
+    queryFn: () => getDashboard(activeMember?.id),
   });
 
   const { data: longData } = useQuery({
-    queryKey: ["longitudinal"],
-    queryFn: getLongitudinalAnalysis,
+    queryKey: ["longitudinal", activeMember?.id],
+    queryFn: () => getLongitudinalAnalysis(activeMember?.id),
   });
 
   if (!data) {
     return null;
   }
 
-  const latestWithShap = data.recentSymptoms.find((s) => s.triage_level || s.shap_explanation_json);
+  const hasEmergencySymptom = data.recentSymptoms.some(
+    (s) => s.triage_level === "Emergency" || s.is_anomaly === 1,
+  );
 
   return (
-    <div className="space-y-8">
-      <PageHeader
-        eyebrow="Dashboard"
-        title="A product-grade command center for your health signals"
-        description="Monitor symptom trends, trigger frequency, medication context, and care-prep actions from a single dashboard."
-        badge="Main dashboard"
-      />
-
-      {/* Isolation Forest Anomaly Alert Banner */}
-      {longData?.recent_anomaly_detected && (
-        <div className="rounded-3xl border-2 border-amber-500/50 bg-gradient-to-r from-amber-500/15 via-amber-500/5 to-transparent p-6 shadow-soft animate-pulse">
-          <div className="flex items-start gap-4">
-            <div className="rounded-2xl bg-amber-500/20 p-3 text-amber-700 dark:text-amber-400">
-              <ShieldAlert className="h-6 w-6" />
-            </div>
-            <div>
-              <div className="flex items-center gap-2">
-                <span className="text-xs font-bold uppercase tracking-wider text-amber-700 dark:text-amber-400">
-                  Isolation Forest Biometric Outlier Alert
-                </span>
-              </div>
-              <h3 className="mt-1 font-display text-xl font-bold text-slate-900 dark:text-white">
-                Physiological Anomaly Detected in Recent Check-In
-              </h3>
-              <p className="mt-1 text-sm text-slate-700 dark:text-slate-300 leading-relaxed">
-                {longData.anomaly_alert_message || "Our unsupervised model detected an unusual convergence of sleep deprivation, high stress, and elevated severity."}
-              </p>
-            </div>
+    <div className="space-y-6">
+      {/* Emergency alert banner */}
+      {hasEmergencySymptom && !bannerDismissed && (
+        <div className="flex items-start gap-3 rounded-lg border border-red-200 bg-red-50 px-4 py-3">
+          <ShieldAlert className="mt-0.5 h-4 w-4 shrink-0 text-red-600" />
+          <div className="flex-1">
+            <p className="text-sm font-semibold text-red-800">
+              A recent check-in was flagged as Emergency or anomalous
+            </p>
+            <p className="mt-0.5 text-xs text-red-700">
+              Review the check-in history below and consider contacting a doctor.
+            </p>
           </div>
+          <button
+            onClick={() => setBannerDismissed(true)}
+            className="rounded-md p-1 text-red-500 hover:bg-red-100"
+            aria-label="Dismiss"
+          >
+            <X className="h-4 w-4" />
+          </button>
         </div>
       )}
 
-      {/* Latest SHAP Clinical Triage Breakdown */}
-      {latestWithShap && (
-        <div className="rounded-3xl border border-emerald-500/30 bg-gradient-to-br from-emerald-500/10 via-white to-slate-50 p-6 shadow-soft">
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-4 border-b border-emerald-500/20 pb-4">
-            <div className="flex items-center gap-3">
-              <div className="rounded-2xl bg-emerald-600 p-3 text-white shadow-md">
-                <Cpu className="h-6 w-6" />
-              </div>
-              <div>
-                <span className="text-xs font-bold uppercase tracking-wider text-emerald-700">
-                  Explainable AI (SHAP TreeExplainer)
-                </span>
-                <h3 className="font-display text-xl font-bold text-slate-900 capitalize">
-                  Latest Triage Assessment: {latestWithShap.symptom}
-                </h3>
-              </div>
-            </div>
-            <div className="flex items-center gap-3">
-              <span className="rounded-full bg-emerald-100 px-3 py-1.5 text-xs font-bold text-emerald-800 border border-emerald-300">
-                Triage Level: {latestWithShap.triage_level || "Routine Checkup"}
-              </span>
-              {latestWithShap.predicted_disease_risk && (
-                <span className="rounded-full bg-slate-900 px-3 py-1.5 text-xs font-bold text-white">
-                  Risk Category: {latestWithShap.predicted_disease_risk}
-                </span>
-              )}
-            </div>
-          </div>
-
-          <p className="text-sm text-slate-700 mb-4 font-medium">
-            {latestWithShap.shap_explanation_json?.human_readable_summary || 
-              `Your assessment for ${latestWithShap.predicted_disease_risk || latestWithShap.symptom} was calculated using gradient boosted trees.`}
-          </p>
-
-          {latestWithShap.shap_explanation_json?.top_contributing_features && (
+      {/* Active member banner */}
+      <div className="flex items-center gap-3 rounded-lg border border-border bg-white px-4 py-3">
+        {activeMember ? (
+          <>
+            <MemberAvatar name={activeMember.name} color={activeMember.avatar_color} size="md" />
             <div>
-              <p className="text-xs font-bold uppercase tracking-wider text-slate-500 mb-2">
-                Top Contributing Shapley Attribution Factors
+              <p className="text-sm font-semibold text-foreground">Viewing: {activeMember.name}</p>
+              <p className="text-xs text-muted-foreground">
+                {RELATION_LABELS[activeMember.relation] ?? activeMember.relation} · {activeMember.age_range}
               </p>
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                {latestWithShap.shap_explanation_json.top_contributing_features.slice(0, 3).map((feat: any, idx: number) => (
-                  <div key={idx} className="rounded-xl border border-slate-200 bg-white/80 p-3 shadow-sm">
-                    <div className="flex items-center justify-between">
-                      <span className="text-xs font-bold text-slate-800">{feat.label}</span>
-                      <span className="text-xs font-extrabold text-emerald-600">+{feat.importance_score}% impact</span>
-                    </div>
-                  </div>
-                ))}
-              </div>
             </div>
-          )}
+          </>
+        ) : (
+          <p className="text-sm text-muted-foreground">Viewing all family members</p>
+        )}
+      </div>
+
+      <div>
+        <h1 className="text-xl font-bold text-foreground">Dashboard</h1>
+        <p className="mt-1 text-sm text-muted-foreground">
+          Symptom trends, trigger frequency, and care-prep actions in one place.
+        </p>
+      </div>
+
+      {/* Anomaly alert */}
+      {longData?.recent_anomaly_detected && (
+        <div className="flex items-start gap-3 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3">
+          <ShieldAlert className="mt-0.5 h-4 w-4 shrink-0 text-amber-600" />
+          <div>
+            <p className="text-sm font-semibold text-amber-800">Biometric outlier detected</p>
+            <p className="mt-0.5 text-xs text-amber-700">
+              {longData.anomaly_alert_message || "An unusual combination of sleep, stress, and severity was detected in a recent check-in."}
+            </p>
+          </div>
         </div>
       )}
 
@@ -133,24 +114,28 @@ export function DashboardScreen() {
           value={String(data.metrics.symptomLogs)}
           detail="Captured across recent entries"
           icon="logs"
+          accent="blue"
         />
         <StatCard
           title="Tracked symptoms"
           value={String(data.metrics.trackedSymptoms)}
           detail="Symptoms with analysis-ready history"
           icon="symptoms"
+          accent="green"
         />
         <StatCard
           title="Active medications"
           value={String(data.metrics.activeMedications)}
           detail="Current medication tracker count"
           icon="medications"
+          accent="amber"
         />
         <StatCard
           title="Average severity"
           value={`${data.metrics.averageSeverity}/10`}
           detail="Across summarized symptom history"
           icon="severity"
+          accent="red"
         />
       </div>
 
@@ -158,27 +143,26 @@ export function DashboardScreen() {
         <SectionCard
           title="Severity trend"
           description="A rolling view of recent symptom intensity."
-          action={<Badge>{USE_MOCK_DATA ? "Mock data" : "Live backend"}</Badge>}
         >
-          <div className="h-80">
+          <div className="h-72">
             <ResponsiveContainer width="100%" height="100%">
               <AreaChart data={data.charts.dailyAverageSeverity}>
                 <defs>
                   <linearGradient id="severity" x1="0" x2="0" y1="0" y2="1">
-                    <stop offset="5%" stopColor="#0f766e" stopOpacity={0.4} />
-                    <stop offset="95%" stopColor="#0f766e" stopOpacity={0.02} />
+                    <stop offset="5%" stopColor="hsl(var(--primary))" stopOpacity={0.25} />
+                    <stop offset="95%" stopColor="hsl(var(--primary))" stopOpacity={0.02} />
                   </linearGradient>
                 </defs>
-                <CartesianGrid strokeDasharray="3 3" stroke="#dce7e5" />
-                <XAxis dataKey="date" stroke="#6b7c78" />
-                <YAxis stroke="#6b7c78" domain={[0, 10]} />
+                <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+                <XAxis dataKey="date" stroke="#94a3b8" fontSize={12} />
+                <YAxis stroke="#94a3b8" fontSize={12} domain={[0, 10]} />
                 <Tooltip />
                 <Area
                   type="monotone"
                   dataKey="averageSeverity"
-                  stroke="#0f766e"
+                  stroke="hsl(var(--primary))"
                   fill="url(#severity)"
-                  strokeWidth={3}
+                  strokeWidth={2}
                 />
               </AreaChart>
             </ResponsiveContainer>
@@ -189,7 +173,7 @@ export function DashboardScreen() {
           title="Quick actions"
           description="Guide users toward the next useful task."
         >
-          <div className="space-y-4">
+          <div className="space-y-3">
             {[
               "Log a symptom with triggers and relief",
               "Review medication notes before an appointment",
@@ -197,11 +181,11 @@ export function DashboardScreen() {
             ].map((item) => (
               <div
                 key={item}
-                className="flex items-center justify-between rounded-2xl border border-border bg-muted/40 px-4 py-4"
+                className="flex items-center justify-between rounded-lg border border-border bg-muted/40 px-3.5 py-3"
               >
-                <div className="flex items-center gap-3">
-                  <div className="rounded-full bg-primary/10 p-2 text-primary">
-                    <Sparkles className="h-4 w-4" />
+                <div className="flex items-center gap-2.5">
+                  <div className="rounded-md bg-primary/10 p-1.5 text-primary">
+                    <Sparkles className="h-3.5 w-3.5" />
                   </div>
                   <p className="text-sm font-medium text-foreground">{item}</p>
                 </div>
@@ -209,7 +193,7 @@ export function DashboardScreen() {
               </div>
             ))}
             {USE_MOCK_DATA ? (
-              <div className="rounded-2xl border border-border bg-muted/40 px-4 py-4 text-sm text-muted-foreground">
+              <div className="rounded-lg border border-border bg-muted/40 px-3.5 py-3 text-sm text-muted-foreground">
                 Mock mode is active. The patterns page includes a report preview for UI review.
               </div>
             ) : (
@@ -229,14 +213,14 @@ export function DashboardScreen() {
           title="Most common triggers"
           description="Trigger frequency from recent analysis-ready logs."
         >
-          <div className="h-72">
+          <div className="h-64">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={data.charts.topTriggers}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#dce7e5" />
-                <XAxis dataKey="trigger" stroke="#6b7c78" />
-                <YAxis stroke="#6b7c78" />
+                <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+                <XAxis dataKey="trigger" stroke="#94a3b8" fontSize={12} />
+                <YAxis stroke="#94a3b8" fontSize={12} />
                 <Tooltip />
-                <Bar dataKey="count" radius={[12, 12, 0, 0]} fill="#0f766e" />
+                <Bar dataKey="count" radius={[6, 6, 0, 0]} fill="hsl(var(--primary))" />
               </BarChart>
             </ResponsiveContainer>
           </div>
@@ -244,22 +228,30 @@ export function DashboardScreen() {
 
         <SectionCard
           title="Recent symptom feed"
-          description="A timeline for the latest high-signal entries."
+          description="Last 5 check-ins for the active profile."
         >
-          <div className="space-y-3">
-            {data.recentSymptoms.map((entry) => (
+          <div className="space-y-2.5">
+            {data.recentSymptoms.length === 0 && (
+              <p className="text-sm text-muted-foreground">No check-ins yet.</p>
+            )}
+            {data.recentSymptoms.slice(0, 5).map((entry) => (
               <div
                 key={entry.id}
-                className="rounded-2xl border border-border bg-white px-4 py-4"
+                className="rounded-lg border border-border bg-white px-3.5 py-3"
               >
-                <div className="flex items-start justify-between gap-4">
-                  <div>
-                    <p className="font-display text-lg font-semibold capitalize">
+                <div className="flex items-start justify-between gap-3">
+                  <div className="min-w-0">
+                    <p className="font-semibold text-foreground capitalize truncate">
                       {entry.symptom}
                     </p>
-                    <p className="text-sm text-muted-foreground">
-                      {entry.triggers.join(", ") || "No triggers recorded"}
+                    <p className="mt-0.5 text-xs text-muted-foreground">
+                      {entry.timestamp ? new Date(entry.timestamp).toLocaleString() : "—"}
                     </p>
+                    {entry.triage_level && (
+                      <div className="mt-1.5">
+                        <TriageBadge level={entry.triage_level} />
+                      </div>
+                    )}
                   </div>
                   <SeverityBadge severity={entry.severity} />
                 </div>

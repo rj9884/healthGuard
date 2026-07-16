@@ -1,28 +1,28 @@
 import { type ReactNode } from "react";
+import { cn } from "@/lib/utils/cn";
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-
-export function SectionCard({
-  title,
-  description,
-  action,
-  children,
-}: {
-  title: string;
+interface SectionCardProps {
+  title?: string;
   description?: string;
-  action?: ReactNode;
   children: ReactNode;
-}) {
+  className?: string;
+  action?: ReactNode;
+  noPad?: boolean;
+}
+
+export function SectionCard({ title, description, children, className, action, noPad }: SectionCardProps) {
   return (
-    <Card className="border-white/70 bg-white/90">
-      <CardHeader className="flex flex-row items-start justify-between gap-4">
-        <div>
-          <CardTitle>{title}</CardTitle>
-          {description ? <CardDescription>{description}</CardDescription> : null}
+    <div className={cn("rounded-xl border border-border bg-white shadow-sm", className)}>
+      {(title || action) && (
+        <div className="flex items-start justify-between gap-4 border-b border-border px-5 py-4">
+          <div>
+            {title && <h3 className="font-semibold text-foreground">{title}</h3>}
+            {description && <p className="mt-0.5 text-sm text-muted-foreground">{description}</p>}
+          </div>
+          {action && <div className="shrink-0">{action}</div>}
         </div>
-        {action}
-      </CardHeader>
-      <CardContent>{children}</CardContent>
-    </Card>
+      )}
+      <div className={cn(noPad ? "" : "p-5")}>{children}</div>
+    </div>
   );
 }

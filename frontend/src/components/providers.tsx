@@ -6,6 +6,7 @@ import { Toaster } from "sonner";
 
 import { createQueryClient } from "@/lib/query/query-client";
 import { AuthProvider } from "@/lib/auth";
+import { FamilyProvider } from "@/lib/family";
 
 export function Providers({ children }: PropsWithChildren) {
   const [queryClient] = useState(() => createQueryClient());
@@ -13,8 +14,10 @@ export function Providers({ children }: PropsWithChildren) {
   return (
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
-        {children}
-        <Toaster richColors position="top-right" />
+        <FamilyProvider>
+          {children}
+          <Toaster richColors position="top-right" />
+        </FamilyProvider>
       </AuthProvider>
     </QueryClientProvider>
   );

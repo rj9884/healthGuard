@@ -1,0 +1,92 @@
+{
+  "_source": "Curated from the WHO Model List of Essential Medicines (22nd edition, 2021) and WHO Model Formulary guidance. Educational reference only — not a substitute for a clinician or pharmacist.",
+  "guidelines": {
+    "Respiratory Infection (Flu/COVID)": {
+      "who_eml_medications": [
+        {"generic_name": "paracetamol", "category": "Antipyretic/Analgesic", "otc": true, "typical_adult_dose": "500-1000 mg every 6-8h, max 4g/day"},
+        {"generic_name": "oral rehydration salts", "category": "Fluid & electrolyte", "otc": true, "typical_adult_dose": "As needed to maintain hydration"}
+      ],
+      "self_care_notes": "Rest, fluids, and fever/pain control. Avoid antibiotics unless a clinician confirms a bacterial infection."
+    },
+    "Cardiovascular Alert (Angina/Arrhythmia)": {
+      "who_eml_medications": [
+        {"generic_name": "aspirin", "category": "Antiplatelet (emergency chest pain only)", "otc": false, "typical_adult_dose": "Chew 300mg immediately if advised by emergency services"}
+      ],
+      "self_care_notes": "This pattern is not self-treatable. Chest pain, arrhythmia, or breathlessness needs immediate emergency evaluation."
+    },
+    "Severe Migraine / Neurological": {
+      "who_eml_medications": [
+        {"generic_name": "ibuprofen", "category": "NSAID/Analgesic", "otc": true, "typical_adult_dose": "400 mg every 6-8h with food, max 1200mg/day OTC"},
+        {"generic_name": "paracetamol", "category": "Analgesic", "otc": true, "typical_adult_dose": "500-1000 mg every 6-8h, max 4g/day"}
+      ],
+      "self_care_notes": "Rest in a dark, quiet room. Sudden 'worst-ever' headache, confusion, or vision loss needs urgent care."
+    },
+    "Gastrointestinal Disorder (IBS/Reflux)": {
+      "who_eml_medications": [
+        {"generic_name": "omeprazole", "category": "Proton-pump inhibitor", "otc": true, "typical_adult_dose": "20 mg once daily before food, short course"},
+        {"generic_name": "oral rehydration salts", "category": "Fluid & electrolyte", "otc": true, "typical_adult_dose": "As needed"}
+      ],
+      "self_care_notes": "Smaller meals, avoid trigger foods. Persistent pain or black stools need a doctor visit."
+    },
+    "Metabolic / Diabetes Risk Alert": {
+      "who_eml_medications": [],
+      "self_care_notes": "This pattern reflects a metabolic risk signal, not a medication-treatable event. Book a routine blood glucose (HbA1c) check with a doctor."
+    },
+    "Dermatological Infection / Allergic Reaction": {
+      "who_eml_medications": [
+        {"generic_name": "cetirizine", "category": "Antihistamine", "otc": true, "typical_adult_dose": "10 mg once daily"},
+        {"generic_name": "hydrocortisone (topical)", "category": "Topical corticosteroid", "otc": true, "typical_adult_dose": "Thin layer on affected area, 1-2x daily, short course"}
+      ],
+      "self_care_notes": "Avoid the suspected trigger. Spreading rash, swelling of the face/throat, or breathing difficulty is an emergency."
+    },
+    "Musculoskeletal Strain & Arthritis": {
+      "who_eml_medications": [
+        {"generic_name": "ibuprofen", "category": "NSAID/Analgesic", "otc": true, "typical_adult_dose": "400 mg every 6-8h with food, max 1200mg/day OTC"},
+        {"generic_name": "paracetamol", "category": "Analgesic", "otc": true, "typical_adult_dose": "500-1000 mg every 6-8h, max 4g/day"}
+      ],
+      "self_care_notes": "Rest, ice/heat, gentle movement. Numbness, inability to bear weight, or deformity needs urgent evaluation."
+    },
+    "Anxiety & Panic Attack": {
+      "who_eml_medications": [],
+      "self_care_notes": "Grounding/breathing techniques help acute episodes. Because panic attacks can mimic cardiac or respiratory emergencies, first-time or severe episodes should be medically evaluated before assuming anxiety."
+    },
+    "Viral Gastroenteritis (Stomach Flu)": {
+      "who_eml_medications": [
+        {"generic_name": "oral rehydration salts", "category": "Fluid & electrolyte", "otc": true, "typical_adult_dose": "200-400 mL after each loose stool"},
+        {"generic_name": "zinc sulfate", "category": "Adjunct (esp. pediatric)", "otc": true, "typical_adult_dose": "As per WHO pediatric diarrhoea protocol; check with a pharmacist for children"}
+      ],
+      "self_care_notes": "Hydration is the priority. Blood in stool, high fever, or signs of dehydration need urgent care."
+    },
+    "Upper Respiratory Infection (Common Cold)": {
+      "who_eml_medications": [
+        {"generic_name": "paracetamol", "category": "Antipyretic/Analgesic", "otc": true, "typical_adult_dose": "500-1000 mg every 6-8h, max 4g/day"}
+      ],
+      "self_care_notes": "Rest, fluids, and steam inhalation. Usually self-limiting within 7-10 days."
+    },
+    "Chronic Fatigue & Occupational Burnout": {
+      "who_eml_medications": [],
+      "self_care_notes": "Prioritize sleep, workload reduction, and stress management. Persistent fatigue over weeks warrants a checkup to rule out anemia, thyroid, or metabolic causes."
+    },
+    "Acute Dehydration / Electrolyte Alert": {
+      "who_eml_medications": [
+        {"generic_name": "oral rehydration salts", "category": "Fluid & electrolyte", "otc": true, "typical_adult_dose": "Rehydrate steadily over 4-6 hours"}
+      ],
+      "self_care_notes": "Rehydrate with ORS, not just plain water. Confusion, fainting, or inability to keep fluids down needs urgent care."
+    },
+    "Sinusitis / Facial Congestion": {
+      "who_eml_medications": [
+        {"generic_name": "paracetamol", "category": "Analgesic", "otc": true, "typical_adult_dose": "500-1000 mg every 6-8h, max 4g/day"},
+        {"generic_name": "saline nasal spray", "category": "Nasal irrigation", "otc": true, "typical_adult_dose": "As needed"}
+      ],
+      "self_care_notes": "Steam and saline rinses help drainage. Symptoms beyond 10 days or facial swelling need a doctor visit."
+    },
+    "Acute Insomnia & Sleep Deprivation": {
+      "who_eml_medications": [],
+      "self_care_notes": "Sleep hygiene (consistent schedule, reduced screens/caffeine) is the first-line approach. Sedatives are not self-prescribed and require a doctor's judgment."
+    },
+    "General Wellness / Normal Health State": {
+      "who_eml_medications": [],
+      "self_care_notes": "No concerning pattern detected. Keep up the daily check-ins."
+    }
+  }
+}

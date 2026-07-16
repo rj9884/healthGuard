@@ -14,9 +14,45 @@ export interface AuthResponse {
   user: UserProfile;
 }
 
+export interface FamilyMember {
+  id: string;
+  account_id: string;
+  name: string;
+  relation: string;         // self | spouse | child | parent | sibling | other
+  age_range: string;        // pediatric | adult | senior
+  sex?: string | null;
+  date_of_birth?: string | null;
+  avatar_color: string;
+  notes?: string | null;
+  created_at: string;
+}
+
+export interface SuggestedMedication {
+  generic_name: string;
+  category: string;
+  otc: boolean;
+  typical_adult_dose: string;
+  caution?: string;
+  live_label_data?: {
+    purpose?: string | null;
+    dosage_and_administration?: string | null;
+    warnings?: string | null;
+    brand_names?: string[];
+  } | null;
+}
+
+export interface CareRecommendation {
+  disclaimer: string;
+  doctor_visit_recommended: boolean;
+  urgency_message: string;
+  self_care_notes?: string;
+  suggested_medications: SuggestedMedication[];
+}
+
 export interface SymptomEntry {
   id: number;
   user_id?: string;
+  member_id?: string | null;
   timestamp: string | null;
   symptom: string;
   severity: number;
@@ -25,13 +61,11 @@ export interface SymptomEntry {
   triggers?: string[];
   relief?: string[];
   notes?: string | null;
-  // Biometrics & Vitals
   sleep_hours?: number;
   stress_level?: number;
   hydration_liters?: number;
   body_temperature_f?: number;
   heart_rate_bpm?: number;
-  // ML Triage & Anomaly Results
   triage_level?: string | null;
   predicted_disease_risk?: string | null;
   shap_explanation_json?: {
@@ -46,17 +80,20 @@ export interface SymptomEntry {
   };
   is_anomaly?: number;
   anomaly_reason?: string | null;
+  care_recommendation?: CareRecommendation | null;
 }
 
 export interface MedicationEntry {
   id: number;
   user_id?: string;
+  member_id?: string | null;
   name: string;
   dosage?: string | null;
   frequency?: string | null;
   start_date?: string | null;
   startDate?: string | null;
   notes?: string | null;
+  source?: string;
 }
 
 export interface AnalysisSummaryItem {
@@ -125,3 +162,22 @@ export interface DashboardPayload {
   }>;
   charts: DashboardCharts;
 }
+
+export const AVATAR_COLORS: Record<string, string> = {
+  teal:   "#0d9488",
+  blue:   "#2563eb",
+  violet: "#7c3aed",
+  rose:   "#e11d48",
+  amber:  "#d97706",
+  green:  "#16a34a",
+  slate:  "#475569",
+};
+
+export const RELATION_LABELS: Record<string, string> = {
+  self:    "Self",
+  spouse:  "Spouse / Partner",
+  child:   "Child",
+  parent:  "Parent",
+  sibling: "Sibling",
+  other:   "Other",
+};

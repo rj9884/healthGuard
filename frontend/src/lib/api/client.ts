@@ -14,24 +14,42 @@ function getAuthHeaders(): Record<string, string> {
   return headers;
 }
 
-export async function fetchJson<T>(path: string, fallback: T): Promise<T> {
-  if (USE_MOCK_DATA) {
-    return fallback;
+/**
+ * `fallback` is only ever returned for GET requests (mock-mode short-circuit,
+ * or a failed fetch). For PATCH/PUT it's unused — the error is rethrown
+ * instead — so callers making a PATCH/PUT with no sensible fallback value
+ * can pass `null`.
+ */
+export async function fetchJson<T>(
+  path: string,
+  fallback: T | null,
+  method: "GET" | "PATCH" | "PUT" = "GET",
+  body?: unknown,
+): Promise<T> {
+  if (USE_MOCK_DATA && method === "GET") {
+    return fallback as T;
   }
 
   try {
     const response = await fetch(`${API_BASE_URL}${path}`, {
+      method,
       cache: "no-store",
-      headers: getAuthHeaders(),
+      headers: {
+        ...(body ? { "Content-Type": "application/json" } : {}),
+        ...getAuthHeaders(),
+      },
+      ...(body ? { body: JSON.stringify(body) } : {}),
     });
 
     if (!response.ok) {
-      return fallback;
+      const err = await response.json().catch(() => ({ detail: "Request failed" }));
+      throw new Error(err.detail || "Request failed");
     }
 
     return (await response.json()) as T;
-  } catch {
-    return fallback;
+  } catch (e) {
+    if (method === "GET") return fallback as T;
+    throw e;
   }
 }
 

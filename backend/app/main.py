@@ -6,7 +6,7 @@ from app.models.user import User
 from app.core.auth import get_password_hash
 
 # Import all models so SQLAlchemy knows about them
-from app.models import user, symptom, medication  # noqa: F401
+from app.models import user, symptom, medication, family_member  # noqa: F401
 from app.models import chat as chat_model  # noqa: F401
 
 Base.metadata.create_all(bind=engine)

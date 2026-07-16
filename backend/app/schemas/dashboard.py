@@ -34,6 +34,9 @@ class DashboardRecentSymptom(BaseModel):
     triggers: list[str]
     relief: list[str]
     notes: str | None
+    triage_level: str | None = None
+    predicted_disease_risk: str | None = None
+    is_anomaly: int | None = 0
 
 
 class DashboardMedication(BaseModel):

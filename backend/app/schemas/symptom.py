@@ -4,6 +4,7 @@ from datetime import datetime
 
 
 class SymptomCreate(BaseModel):
+    member_id: Optional[str] = None
     symptom: str
     severity: int = Field(ge=1, le=10)
     duration_hr: Optional[float] = None
@@ -20,6 +21,7 @@ class SymptomCreate(BaseModel):
 class SymptomResponse(BaseModel):
     id: int
     user_id: str
+    member_id: Optional[str] = None
     timestamp: datetime
     symptom: str
     severity: int
@@ -40,3 +42,16 @@ class SymptomResponse(BaseModel):
 
     class Config:
         from_attributes = True
+
+
+class CareRecommendation(BaseModel):
+    """Attached to a symptom log response: what to do next, sourced from the
+    WHO Model List of Essential Medicines plus live drug-label enrichment."""
+    disclaimer: str
+    doctor_visit_recommended: bool
+    urgency_message: str
+    suggested_medications: list[dict]
+
+
+class SymptomCreateResponse(SymptomResponse):
+    care_recommendation: Optional[CareRecommendation] = None

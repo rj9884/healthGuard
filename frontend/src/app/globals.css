@@ -4,34 +4,137 @@
 
 @layer base {
   :root {
-    --background: 167 40% 96%;
-    --foreground: 168 24% 14%;
-    --card: 0 0% 100%;
-    --card-foreground: 168 24% 14%;
-    --primary: 173 77% 27%;
+    /* ─── Background & Surface ─────────────────────────────── */
+    --background:    0 0% 98%;          /* #fafafa — near-white page */
+    --surface:       0 0% 100%;         /* #ffffff — card white      */
+    --surface-alt:   220 14% 96%;       /* #f3f4f6 — subtle inset    */
+
+    /* ─── Foreground ───────────────────────────────────────── */
+    --foreground:    222 24% 12%;       /* #171e2c — near-black text */
+    --foreground-muted: 220 9% 46%;     /* #6b7280 — secondary text  */
+
+    /* ─── Semantic tokens (shadcn compat) ──────────────────── */
+    --card:          0 0% 100%;
+    --card-foreground: 222 24% 12%;
+
+    --primary:       217 91% 40%;       /* #0a54c4 — confident blue  */
     --primary-foreground: 0 0% 100%;
-    --secondary: 172 30% 94%;
-    --secondary-foreground: 168 24% 14%;
-    --muted: 166 22% 93%;
-    --muted-foreground: 167 10% 43%;
-    --accent: 172 30% 94%;
-    --accent-foreground: 168 24% 14%;
-    --border: 167 18% 85%;
-    --input: 167 18% 85%;
-    --ring: 173 77% 27%;
-    --success: 154 69% 35%;
+
+    --secondary:     220 14% 94%;
+    --secondary-foreground: 222 24% 12%;
+
+    --muted:         220 14% 94%;
+    --muted-foreground: 220 9% 46%;
+
+    --accent:        217 91% 95%;       /* #e8f0fe — blue tint       */
+    --accent-foreground: 217 91% 40%;
+
+    --border:        220 13% 89%;       /* #dde1e9 */
+    --input:         220 13% 89%;
+    --ring:          217 91% 40%;
+
+    /* ─── Semantic status ──────────────────────────────────── */
+    --success:       142 72% 29%;       /* #167a43 — stable green    */
+    --success-bg:    142 72% 95%;
     --success-foreground: 0 0% 100%;
-    --warning: 31 92% 45%;
+
+    --warning:       36 91% 40%;        /* #c47a03 — amber           */
+    --warning-bg:    36 91% 95%;
     --warning-foreground: 0 0% 100%;
-    --danger: 0 73% 45%;
+
+    --danger:        0 75% 43%;         /* #c2241a — clear red       */
+    --danger-bg:     0 75% 96%;
     --danger-foreground: 0 0% 100%;
+
+    --emergency:     15 85% 40%;        /* #c44010 — urgent orange-red */
+    --emergency-bg:  15 85% 95%;
   }
 
   * {
     @apply border-border;
   }
 
+  html {
+    scroll-behavior: smooth;
+  }
+
   body {
-    @apply bg-background font-sans text-foreground antialiased;
+    @apply bg-background text-foreground antialiased;
+    font-family: var(--font-body), system-ui, sans-serif;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-display), system-ui, sans-serif;
+    font-weight: 600;
+  }
+
+  /* ─── Custom scrollbar ──────────────────────────── */
+  ::-webkit-scrollbar { width: 5px; height: 5px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { @apply rounded-full bg-border; }
+  ::-webkit-scrollbar-thumb:hover { @apply bg-foreground/20; }
+
+  /* ─── Range slider ──────────────────────────────── */
+  input[type="range"] {
+    @apply w-full cursor-pointer appearance-none;
+    height: 4px;
+    border-radius: 9999px;
+    background: hsl(var(--border));
+    outline: none;
+  }
+  input[type="range"]::-webkit-slider-thumb {
+    @apply appearance-none;
+    width: 18px;
+    height: 18px;
+    border-radius: 9999px;
+    background: hsl(var(--primary));
+    border: 3px solid white;
+    box-shadow: 0 0 0 1px hsl(var(--primary) / 0.3), 0 2px 6px rgba(0,0,0,0.15);
+    cursor: pointer;
+    transition: transform 0.1s;
+  }
+  input[type="range"]::-webkit-slider-thumb:hover {
+    transform: scale(1.15);
+  }
+  input[type="range"]::-moz-range-thumb {
+    width: 18px;
+    height: 18px;
+    border-radius: 9999px;
+    background: hsl(var(--primary));
+    border: 3px solid white;
+    cursor: pointer;
+  }
+}
+
+@layer utilities {
+  .text-balance { text-wrap: balance; }
+  .font-display { font-family: var(--font-display), system-ui, sans-serif; }
+
+  /* Card hover lift */
+  .card-lift {
+    @apply transition-all duration-200 ease-out;
+  }
+  .card-lift:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.09);
+  }
+
+  /* Triage status colours */
+  .triage-self-care    { @apply bg-green-50 text-green-800 border-green-200; }
+  .triage-routine      { @apply bg-blue-50 text-blue-800 border-blue-200; }
+  .triage-urgent       { @apply bg-amber-50 text-amber-800 border-amber-200; }
+  .triage-emergency    { @apply bg-red-50 text-red-800 border-red-200; }
+
+  /* Section divider */
+  .divider { @apply border-t border-border; }
+
+  /* Dot pulse animation for "live" indicators */
+  .pulse-dot {
+    @apply inline-block h-2 w-2 rounded-full bg-green-500;
+    animation: pulse-dot 2s ease-in-out infinite;
+  }
+  @keyframes pulse-dot {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50%       { opacity: 0.4; transform: scale(0.7); }
   }
 }

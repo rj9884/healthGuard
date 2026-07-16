@@ -4,118 +4,158 @@ import React, { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/lib/auth";
-import { HeartPulse, ArrowRight, Sparkles, ShieldCheck } from "lucide-react";
+import { Heart, ArrowRight, Activity, Shield, Users } from "lucide-react";
 import { toast } from "sonner";
 
+const FEATURES = [
+  { icon: Activity, title: "Daily check-ins", desc: "Track symptoms & vitals for every family member." },
+  { icon: Shield, title: "ML-powered triage", desc: "LightGBM + SHAP explains what the pattern means." },
+  { icon: Users, title: "Family profiles", desc: "One account, separate health records per member." },
+];
+
 export default function LoginPage() {
-  const [email, setEmail] = useState("");
+  const [email, setEmail]       = useState("");
   const [password, setPassword] = useState("");
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading]   = useState(false);
   const { login, enableGuestDemo } = useAuth();
   const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!email || !password) {
-      toast.error("Please enter both email and password.");
-      return;
-    }
+    if (!email || !password) { toast.error("Enter email and password."); return; }
     setLoading(true);
     try {
       await login(email, password);
-      toast.success("Successfully logged in!");
       router.push("/dashboard");
     } catch (err: any) {
-      toast.error(err.message || "Invalid credentials. Try guest demo mode!");
+      toast.error(err.message || "Incorrect email or password.");
     } finally {
       setLoading(false);
     }
   };
 
-  const handleGuestDemo = () => {
+  const handleGuest = () => {
     enableGuestDemo();
-    toast.success("Entering HealthGuard Demo Mode!");
     router.push("/dashboard");
   };
 
   return (
-    <div className="min-h-[100dvh] flex flex-col justify-center items-center bg-slate-950 text-slate-100 px-4 py-12">
-      {/* Brand Header */}
-      <Link href="/" className="flex items-center gap-3 mb-8 hover:opacity-90 transition">
-        <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-600 text-white shadow-lg shadow-emerald-600/30">
-          <HeartPulse className="h-6 w-6" />
-        </div>
-        <span className="font-display text-2xl font-bold tracking-tight text-white">HealthGuard</span>
-      </Link>
-
-      {/* Login Form Card */}
-      <div className="w-full max-w-md rounded-3xl border border-slate-800 bg-slate-900/90 p-8 shadow-2xl backdrop-blur">
-        <div className="text-center mb-8">
-          <h1 className="font-display text-2xl font-bold text-white">Welcome back</h1>
-          <p className="text-sm text-slate-400 mt-1">Sign in to access your biometric triage history</p>
-        </div>
-
-        <form onSubmit={handleSubmit} className="space-y-5">
-          <div>
-            <label className="block text-xs font-semibold uppercase tracking-wider text-slate-300 mb-2">
-              Email Address
-            </label>
-            <input
-              type="email"
-              required
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="patient@healthguard.ai"
-              className="w-full rounded-xl border border-slate-700 bg-slate-950 px-4 py-3 text-sm text-white placeholder-slate-500 focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500 transition"
-            />
+    <div className="flex min-h-[100dvh] bg-background">
+      {/* Left panel — branding (hidden on mobile) */}
+      <div className="hidden lg:flex lg:w-[480px] lg:shrink-0 lg:flex-col lg:justify-between lg:border-r lg:border-border lg:bg-white lg:px-12 lg:py-16">
+        <div>
+          <div className="flex items-center gap-3">
+            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary text-white">
+              <Heart className="h-5 w-5" />
+            </div>
+            <span className="text-xl font-bold text-foreground">HealthGuard</span>
           </div>
+          <p className="mt-3 text-sm text-muted-foreground">Your family's daily health companion.</p>
 
-          <div>
-            <label className="block text-xs font-semibold uppercase tracking-wider text-slate-300 mb-2">
-              Password
-            </label>
-            <input
-              type="password"
-              required
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="••••••••"
-              className="w-full rounded-xl border border-slate-700 bg-slate-950 px-4 py-3 text-sm text-white placeholder-slate-500 focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500 transition"
-            />
+          <div className="mt-12 space-y-8">
+            {FEATURES.map(({ icon: Icon, title, desc }) => (
+              <div key={title} className="flex gap-4">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-border bg-muted">
+                  <Icon className="h-4 w-4 text-primary" />
+                </div>
+                <div>
+                  <p className="font-semibold text-foreground">{title}</p>
+                  <p className="mt-0.5 text-sm text-muted-foreground">{desc}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <p className="text-[11px] text-muted-foreground">
+          Educational reference only. Not a diagnostic or emergency service.
+        </p>
+      </div>
+
+      {/* Right panel — form */}
+      <div className="flex flex-1 flex-col items-center justify-center px-6 py-12">
+        {/* Mobile logo */}
+        <div className="mb-10 flex items-center gap-2 lg:hidden">
+          <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary text-white">
+            <Heart className="h-4 w-4" />
+          </div>
+          <span className="text-lg font-bold text-foreground">HealthGuard</span>
+        </div>
+
+        <div className="w-full max-w-sm">
+          <h1 className="text-2xl font-bold text-foreground">Sign in</h1>
+          <p className="mt-1 text-sm text-muted-foreground">
+            Access your household health dashboard.
+          </p>
+
+          <form onSubmit={handleSubmit} className="mt-8 space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-foreground" htmlFor="email">
+                Email address
+              </label>
+              <input
+                id="email"
+                type="email"
+                required
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="you@example.com"
+                className="mt-1.5 block w-full rounded-lg border border-border bg-white px-3.5 py-2.5 text-sm text-foreground placeholder-muted-foreground shadow-sm transition focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
+              />
+            </div>
+
+            <div>
+              <div className="flex items-center justify-between">
+                <label className="block text-sm font-medium text-foreground" htmlFor="password">
+                  Password
+                </label>
+              </div>
+              <input
+                id="password"
+                type="password"
+                required
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="••••••••"
+                className="mt-1.5 block w-full rounded-lg border border-border bg-white px-3.5 py-2.5 text-sm text-foreground placeholder-muted-foreground shadow-sm transition focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
+              />
+            </div>
+
+            <button
+              type="submit"
+              disabled={loading}
+              className="flex w-full items-center justify-center gap-2 rounded-lg bg-primary px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-primary/90 disabled:opacity-50"
+            >
+              {loading ? "Signing in…" : "Sign in"} <ArrowRight className="h-4 w-4" />
+            </button>
+          </form>
+
+          <div className="relative my-6">
+            <div className="absolute inset-0 flex items-center">
+              <div className="w-full border-t border-border" />
+            </div>
+            <div className="relative flex justify-center">
+              <span className="bg-background px-3 text-xs text-muted-foreground">
+                or
+              </span>
+            </div>
           </div>
 
           <button
-            type="submit"
-            disabled={loading}
-            className="w-full inline-flex items-center justify-center gap-2 rounded-xl bg-emerald-600 px-6 py-3.5 text-sm font-bold text-white shadow-lg shadow-emerald-600/25 transition hover:bg-emerald-500 disabled:opacity-50 whitespace-nowrap"
+            type="button"
+            onClick={handleGuest}
+            className="flex w-full items-center justify-center gap-2 rounded-lg border border-border bg-white px-4 py-2.5 text-sm font-medium text-foreground shadow-sm transition hover:bg-muted"
           >
-            {loading ? "Signing In..." : "Sign In"} <ArrowRight className="h-4 w-4" />
+            Continue as guest (demo data)
           </button>
-        </form>
 
-        <div className="relative my-6">
-          <div className="absolute inset-0 flex items-center">
-            <div className="w-full border-t border-slate-800" />
-          </div>
-          <div className="relative flex justify-center text-xs uppercase">
-            <span className="bg-slate-900 px-2 text-slate-500">Or continue without account</span>
-          </div>
+          <p className="mt-8 text-center text-sm text-muted-foreground">
+            No account?{" "}
+            <Link href="/register" className="font-semibold text-primary hover:underline">
+              Create one free
+            </Link>
+          </p>
         </div>
-
-        <button
-          type="button"
-          onClick={handleGuestDemo}
-          className="w-full inline-flex items-center justify-center gap-2 rounded-xl border border-slate-700 bg-slate-800/80 px-6 py-3.5 text-sm font-semibold text-slate-200 transition hover:bg-slate-800 hover:border-slate-600 whitespace-nowrap"
-        >
-          <Sparkles className="h-4 w-4 text-emerald-400" /> Explore Guest Demo Mode
-        </button>
-
-        <p className="mt-8 text-center text-xs text-slate-400">
-          Don&apos;t have an account?{" "}
-          <Link href="/register" className="font-semibold text-emerald-400 hover:underline">
-            Register here
-          </Link>
-        </p>
       </div>
     </div>
   );

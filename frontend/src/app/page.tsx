@@ -4,17 +4,14 @@ import React from "react";
 import Link from "next/link";
 import { useAuth } from "@/lib/auth";
 import { useRouter } from "next/navigation";
-import { 
-  HeartPulse, 
-  Activity, 
-  ShieldAlert, 
-  Sparkles, 
-  Cpu, 
-  LineChart, 
-  ArrowRight, 
+import {
+  HeartPulse,
+  ShieldAlert,
+  Sparkles,
+  Cpu,
+  LineChart,
+  ArrowRight,
   CheckCircle2,
-  Stethoscope,
-  Lock
 } from "lucide-react";
 
 export default function LandingPage() {
@@ -27,30 +24,30 @@ export default function LandingPage() {
   };
 
   return (
-    <div className="min-h-[100dvh] flex flex-col bg-slate-950 text-slate-100 selection:bg-emerald-500 selection:text-white font-sans">
+    <div className="flex min-h-[100dvh] flex-col bg-background font-sans text-foreground">
       {/* Navigation Header */}
-      <header className="sticky top-0 z-50 border-b border-slate-800/80 bg-slate-950/80 backdrop-blur-md px-6 py-4">
-        <div className="max-w-7xl mx-auto flex items-center justify-between">
+      <header className="sticky top-0 z-50 border-b border-border bg-white px-6 py-4">
+        <div className="mx-auto flex max-w-7xl items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-600 text-white shadow-lg shadow-emerald-600/30">
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary text-white">
               <HeartPulse className="h-6 w-6" />
             </div>
             <div>
-              <span className="text-xs font-bold uppercase tracking-widest text-emerald-400">Clinical AI</span>
-              <h1 className="font-display text-xl font-bold tracking-tight text-white">HealthGuard</h1>
+              <span className="text-xs font-bold uppercase tracking-widest text-primary">Clinical AI</span>
+              <h1 className="font-display text-xl font-bold tracking-tight text-foreground">HealthGuard</h1>
             </div>
           </div>
 
           <div className="flex items-center gap-4">
-            <Link 
-              href="/login" 
-              className="text-sm font-semibold text-slate-300 hover:text-white transition whitespace-nowrap"
+            <Link
+              href="/login"
+              className="whitespace-nowrap text-sm font-semibold text-muted-foreground transition hover:text-foreground"
             >
               Sign In
             </Link>
-            <Link 
-              href="/register" 
-              className="inline-flex items-center justify-center rounded-xl bg-emerald-600 px-4 py-2.5 text-sm font-semibold text-white shadow-md shadow-emerald-600/20 transition hover:bg-emerald-500 whitespace-nowrap"
+            <Link
+              href="/register"
+              className="inline-flex items-center justify-center whitespace-nowrap rounded-lg bg-primary px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-primary/90"
             >
               Get Started
             </Link>
@@ -59,101 +56,95 @@ export default function LandingPage() {
       </header>
 
       {/* Hero Section */}
-      <section className="relative overflow-hidden pt-20 pb-28 md:pt-32 md:pb-40 px-6">
-        {/* Glow Effects */}
-        <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[300px] bg-emerald-600/20 blur-[140px] rounded-full pointer-events-none" />
-        <div className="absolute top-1/3 right-10 w-[400px] h-[400px] bg-teal-600/10 blur-[160px] rounded-full pointer-events-none" />
-
-        <div className="max-w-5xl mx-auto text-center relative z-10">
-          <div className="inline-flex items-center gap-2 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-4 py-1.5 text-xs font-medium text-emerald-300 mb-8 animate-pulse">
-            <Sparkles className="h-3.5 w-3.5 text-emerald-400" />
-            <span>Powered by LightGBM & Explainable AI (SHAP)</span>
+      <section className="px-6 pb-24 pt-20 md:pb-32 md:pt-28">
+        <div className="mx-auto max-w-5xl text-center">
+          <div className="mb-8 inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/5 px-4 py-1.5 text-xs font-medium text-primary">
+            <Sparkles className="h-3.5 w-3.5" />
+            <span>Built for families, backed by real ML</span>
           </div>
 
-          <h1 className="font-display text-4xl sm:text-6xl lg:text-7xl font-extrabold tracking-tight text-white leading-[1.1] mb-8">
-            Longitudinal Biometrics & <br className="hidden sm:inline" />
-            <span className="bg-gradient-to-r from-emerald-400 via-teal-300 to-cyan-400 bg-clip-text text-transparent">
-              Clinical Triage Intelligence
-            </span>
+          <h1 className="mb-8 font-display text-4xl font-extrabold leading-[1.1] tracking-tight text-foreground sm:text-6xl lg:text-7xl">
+            Family health tracking <br className="hidden sm:inline" />
+            <span className="text-primary">that explains itself.</span>
           </h1>
 
-          <p className="max-w-2xl mx-auto text-lg sm:text-xl text-slate-300 font-normal leading-relaxed mb-10">
-            HealthGuard bridges consumer biometric vitals and medical risk classification. Track daily symptoms with instant SHAP attribution breakdowns, anomaly alerting, and statistical correlation discovery.
+          <p className="mx-auto mb-10 max-w-2xl text-lg font-normal leading-relaxed text-muted-foreground sm:text-xl">
+            Log symptoms for everyone in your family and get instant, plain-English risk explanations backed by real machine learning — not just averages.
           </p>
 
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 max-w-md mx-auto">
+          <div className="mx-auto flex max-w-md flex-col items-center justify-center gap-4 sm:flex-row">
             <Link
               href="/register"
-              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-xl bg-emerald-600 px-8 py-4 text-base font-bold text-white shadow-xl shadow-emerald-600/25 transition hover:bg-emerald-500 hover:scale-[1.02] active:scale-[0.98] whitespace-nowrap"
+              className="inline-flex w-full items-center justify-center gap-2 whitespace-nowrap rounded-lg bg-primary px-8 py-4 text-base font-bold text-white transition hover:bg-primary/90 sm:w-auto"
             >
               Start Health Triage <ArrowRight className="h-5 w-5" />
             </Link>
 
             <button
               onClick={handleDemoClick}
-              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-xl border border-slate-700 bg-slate-900/80 px-8 py-4 text-base font-semibold text-slate-200 transition hover:bg-slate-800 hover:border-slate-600 whitespace-nowrap"
+              className="inline-flex w-full items-center justify-center gap-2 whitespace-nowrap rounded-lg border border-border bg-white px-8 py-4 text-base font-semibold text-foreground transition hover:bg-muted sm:w-auto"
             >
               Explore Live Demo
             </button>
           </div>
 
-          <div className="mt-12 flex items-center justify-center gap-8 text-xs font-semibold text-slate-400 uppercase tracking-wider">
-            <span className="flex items-center gap-1.5"><CheckCircle2 className="h-4 w-4 text-emerald-400" /> No Heavy Transformers</span>
-            <span className="flex items-center gap-1.5"><CheckCircle2 className="h-4 w-4 text-emerald-400" /> 100% Free Tier Deployable</span>
-            <span className="flex items-center gap-1.5"><CheckCircle2 className="h-4 w-4 text-emerald-400" /> Privacy First SQLite</span>
+          <div className="mt-12 flex flex-wrap items-center justify-center gap-x-8 gap-y-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+            <span className="flex items-center gap-1.5"><CheckCircle2 className="h-4 w-4 text-primary" /> Explainable, not a black box</span>
+            <span className="flex items-center gap-1.5"><CheckCircle2 className="h-4 w-4 text-primary" /> Built for the whole family</span>
+            <span className="flex items-center gap-1.5"><CheckCircle2 className="h-4 w-4 text-primary" /> Your data stays on your device</span>
           </div>
         </div>
       </section>
 
       {/* Value Grid Section */}
-      <section className="py-24 bg-slate-900/60 border-t border-slate-800 px-6">
-        <div className="max-w-7xl mx-auto">
-          <div className="text-center max-w-3xl mx-auto mb-16">
-            <h2 className="font-display text-3xl sm:text-4xl font-bold text-white mb-4">
-              Real Machine Learning. Zero Monolithic Bloat.
+      <section className="border-t border-border bg-white px-6 py-24">
+        <div className="mx-auto max-w-7xl">
+          <div className="mx-auto mb-16 max-w-3xl text-center">
+            <h2 className="mb-4 font-display text-3xl font-bold text-foreground sm:text-4xl">
+              How HealthGuard actually works
             </h2>
-            <p className="text-slate-400 text-base sm:text-lg">
-              We eliminated generic averaging and 500MB vision transformers in favor of specialized, highly interpretable gradient boosted decision trees and statistical correlation engines.
+            <p className="text-base text-muted-foreground sm:text-lg">
+              No generic averages or guesswork. Every risk explanation comes from a real, interpretable machine learning model — the same kind used in clinical decision-support tools, tuned to stay fast and lightweight.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
             {/* Feature 1 */}
-            <div className="rounded-3xl border border-slate-800 bg-slate-900/90 p-8 hover:border-slate-700 transition">
-              <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-emerald-500/10 text-emerald-400 mb-6">
+            <div className="rounded-xl border border-border bg-white p-8 transition hover:border-primary/30">
+              <div className="mb-6 flex h-12 w-12 items-center justify-center rounded-lg bg-blue-50 text-blue-600">
                 <Cpu className="h-6 w-6" />
               </div>
-              <h3 className="font-display text-xl font-bold text-white mb-3">
-                LightGBM Triage & SHAP Explainers
+              <h3 className="mb-3 font-display text-xl font-bold text-foreground">
+                Explanations, not just a verdict
               </h3>
-              <p className="text-slate-400 text-sm leading-relaxed">
-                Every symptom log runs through our specialized 15-class disease triage classifier. SHAP TreeExplainers calculate precise Shapley attribution values so you know exactly which symptom drove your assessment.
+              <p className="text-sm leading-relaxed text-muted-foreground">
+                Every symptom log runs through a real LightGBM classifier, and SHAP explainability shows you exactly which symptom drove the result — not a black-box score.
               </p>
             </div>
 
             {/* Feature 2 */}
-            <div className="rounded-3xl border border-slate-800 bg-slate-900/90 p-8 hover:border-slate-700 transition">
-              <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-teal-500/10 text-teal-400 mb-6">
+            <div className="rounded-xl border border-border bg-white p-8 transition hover:border-primary/30">
+              <div className="mb-6 flex h-12 w-12 items-center justify-center rounded-lg bg-amber-50 text-amber-600">
                 <ShieldAlert className="h-6 w-6" />
               </div>
-              <h3 className="font-display text-xl font-bold text-white mb-3">
-                Isolation Forest Anomaly Detection
+              <h3 className="mb-3 font-display text-xl font-bold text-foreground">
+                Catches what looks off, early
               </h3>
-              <p className="text-slate-400 text-sm leading-relaxed">
-                Unsupervised anomaly algorithms scan your biometric vital signs (sleep, stress level, hydration, temperature, heart rate) to instantly flag physiological outlier check-ins and warn you before symptoms escalate.
+              <p className="text-sm leading-relaxed text-muted-foreground">
+                An Isolation Forest model watches your logged vitals — sleep, stress, hydration, temperature, heart rate — and flags check-ins that look out of the ordinary before they become a bigger problem.
               </p>
             </div>
 
             {/* Feature 3 */}
-            <div className="rounded-3xl border border-slate-800 bg-slate-900/90 p-8 hover:border-slate-700 transition">
-              <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-cyan-500/10 text-cyan-400 mb-6">
+            <div className="rounded-xl border border-border bg-white p-8 transition hover:border-primary/30">
+              <div className="mb-6 flex h-12 w-12 items-center justify-center rounded-lg bg-green-50 text-green-600">
                 <LineChart className="h-6 w-6" />
               </div>
-              <h3 className="font-display text-xl font-bold text-white mb-3">
-                Longitudinal $p$-Value Correlations
+              <h3 className="mb-3 font-display text-xl font-bold text-foreground">
+                Finds your real triggers over time
               </h3>
-              <p className="text-slate-400 text-sm leading-relaxed">
-                We perform rigorous Scipy hypothesis testing across your health timeline, computing Pearson and Spearman correlation coefficients and Mutual Information scores to isolate true lifestyle triggers from protective factors.
+              <p className="text-sm leading-relaxed text-muted-foreground">
+                HealthGuard runs statistical tests across your health timeline — not just eyeballing trends — to separate real lifestyle triggers from coincidence.
               </p>
             </div>
           </div>
@@ -161,25 +152,25 @@ export default function LandingPage() {
       </section>
 
       {/* Interactive Callout */}
-      <section className="py-20 px-6">
-        <div className="max-w-5xl mx-auto rounded-3xl border border-emerald-500/20 bg-gradient-to-br from-emerald-950/40 via-slate-900 to-slate-950 p-10 sm:p-14 text-center relative overflow-hidden">
-          <div className="relative z-10 max-w-2xl mx-auto">
-            <h2 className="font-display text-3xl sm:text-4xl font-bold text-white mb-4">
-              Ready to experience intelligent health tracking?
+      <section className="px-6 py-20">
+        <div className="mx-auto max-w-5xl rounded-xl bg-primary p-10 text-center sm:p-14">
+          <div className="mx-auto max-w-2xl">
+            <h2 className="mb-4 font-display text-3xl font-bold text-white sm:text-4xl">
+              Ready to start tracking your family's health?
             </h2>
-            <p className="text-slate-300 text-base sm:text-lg mb-8">
-              Whether you are evaluating biometrics for daily self-care or preparing structured data for your doctor, HealthGuard puts explainable AI at your fingertips.
+            <p className="mb-8 text-base text-white/85 sm:text-lg">
+              Whether it's daily self-care or getting organized before a doctor's visit, HealthGuard gives you clear, explainable answers — not just numbers.
             </p>
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+            <div className="flex flex-col items-center justify-center gap-4 sm:flex-row">
               <Link
                 href="/register"
-                className="w-full sm:w-auto inline-flex items-center justify-center rounded-xl bg-emerald-600 px-8 py-3.5 text-sm font-bold text-white shadow-lg shadow-emerald-600/30 hover:bg-emerald-500 transition whitespace-nowrap"
+                className="inline-flex w-full items-center justify-center whitespace-nowrap rounded-lg bg-white px-8 py-3.5 text-sm font-bold text-primary transition hover:bg-white/90 sm:w-auto"
               >
                 Create Your Account
               </Link>
               <button
                 onClick={handleDemoClick}
-                className="w-full sm:w-auto inline-flex items-center justify-center rounded-xl border border-slate-700 bg-slate-800/80 px-8 py-3.5 text-sm font-semibold text-slate-200 hover:bg-slate-700 transition whitespace-nowrap"
+                className="inline-flex w-full items-center justify-center whitespace-nowrap rounded-lg border border-white/30 bg-transparent px-8 py-3.5 text-sm font-semibold text-white transition hover:bg-white/10 sm:w-auto"
               >
                 Try Guest Demo
               </button>
@@ -189,16 +180,16 @@ export default function LandingPage() {
       </section>
 
       {/* Footer */}
-      <footer className="mt-auto border-t border-slate-800/80 py-8 px-6 text-center text-xs text-slate-500">
-        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
+      <footer className="mt-auto border-t border-border px-6 py-8 text-center text-xs text-muted-foreground">
+        <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-4 sm:flex-row">
           <div className="flex items-center gap-2">
-            <HeartPulse className="h-4 w-4 text-emerald-500" />
-            <span className="font-semibold text-slate-400">HealthGuard AI-ML Engine</span>
+            <HeartPulse className="h-4 w-4 text-primary" />
+            <span className="font-semibold text-foreground">HealthGuard AI-ML Engine</span>
           </div>
           <p>⚠️ For educational and research purposes only. Does not constitute medical advice or definitive diagnosis.</p>
           <div className="flex gap-4">
-            <Link href="/login" className="hover:text-slate-300 transition">Sign In</Link>
-            <Link href="/register" className="hover:text-slate-300 transition">Register</Link>
+            <Link href="/login" className="transition hover:text-foreground">Sign In</Link>
+            <Link href="/register" className="transition hover:text-foreground">Register</Link>
           </div>
         </div>
       </footer>

@@ -5,6 +5,7 @@ from app.models.database import get_db
 from app.models.user import User
 from app.schemas.auth import UserRegister, UserLogin, Token, UserResponse
 from app.core.auth import get_password_hash, verify_password, create_access_token, get_current_user
+from app.services.family_member_service import ensure_self_profile
 
 router = APIRouter()
 
@@ -34,6 +35,17 @@ def register_user(payload: UserRegister, db: Session = Depends(get_db)):
     db.add(new_user)
     db.commit()
     db.refresh(new_user)
+
+    # Every household account starts with one "self" profile, so the person who
+    # registered can immediately log a check-in; more family members can be
+    # added afterwards from the profile switcher.
+    ensure_self_profile(
+        db,
+        account_id=new_user.id,
+        name=new_user.name,
+        age_range=new_user.age_range or "adult",
+        sex=new_user.sex,
+    )
 
     access_token = create_access_token({"sub": new_user.id})
     return {

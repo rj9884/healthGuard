@@ -8,6 +8,7 @@ class SymptomLog(Base):
 
     id = Column(Integer, primary_key=True, index=True, autoincrement=True)
     user_id = Column(String, ForeignKey("users.id"), default="default_user")
+    member_id = Column(String, ForeignKey("family_members.id"), nullable=True, index=True)
     timestamp = Column(DateTime, default=lambda: datetime.now(timezone.utc))
     symptom = Column(String, nullable=False)
     severity = Column(Integer)              # 1–10

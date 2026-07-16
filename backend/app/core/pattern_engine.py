@@ -4,12 +4,15 @@ from app.models.symptom import SymptomLog
 from app.ml.anomaly_detector import detect_anomalies_and_correlations
 
 
-def get_longitudinal_analysis(db: Session, user_id: str) -> dict:
+def get_longitudinal_analysis(db: Session, user_id: str, member_id: str | None = None) -> dict:
     """
     Runs unsupervised Isolation Forest anomaly detection and Scipy statistical hypothesis testing
     across the user's entire longitudinal vitals and symptom history.
     """
-    rows = db.query(SymptomLog).filter(SymptomLog.user_id == user_id).order_by(SymptomLog.timestamp.asc()).all()
+    query = db.query(SymptomLog).filter(SymptomLog.user_id == user_id)
+    if member_id:
+        query = query.filter(SymptomLog.member_id == member_id)
+    rows = query.order_by(SymptomLog.timestamp.asc()).all()
     ml_results = detect_anomalies_and_correlations(rows)
     
     # Calculate triage urgency distribution across user history
@@ -22,15 +25,14 @@ def get_longitudinal_analysis(db: Session, user_id: str) -> dict:
     return ml_results
 
 
-def analyze_patterns(db: Session, user_id: str, symptom: str) -> dict:
+def analyze_patterns(db: Session, user_id: str, symptom: str, member_id: str | None = None) -> dict:
     """
     Load symptom history and compute statistical correlation matrix and trigger impact.
     """
-    rows = (
-        db.query(SymptomLog)
-        .filter(SymptomLog.user_id == user_id)
-        .all()
-    )
+    query = db.query(SymptomLog).filter(SymptomLog.user_id == user_id)
+    if member_id:
+        query = query.filter(SymptomLog.member_id == member_id)
+    rows = query.all()
 
     if len(rows) < 3:
         return {
@@ -66,9 +68,12 @@ def analyze_patterns(db: Session, user_id: str, symptom: str) -> dict:
     }
 
 
-def get_symptom_summary(db: Session, user_id: str) -> list[dict]:
+def get_symptom_summary(db: Session, user_id: str, member_id: str | None = None) -> list[dict]:
     """Get a summary of all symptoms and their counts for a user."""
-    rows = db.query(SymptomLog).filter(SymptomLog.user_id == user_id).all()
+    query = db.query(SymptomLog).filter(SymptomLog.user_id == user_id)
+    if member_id:
+        query = query.filter(SymptomLog.member_id == member_id)
+    rows = query.all()
     if not rows:
         return []
 

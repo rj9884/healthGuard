@@ -1,6 +1,8 @@
 import type {
   AnalysisSummaryItem,
+  CareRecommendation,
   DashboardPayload,
+  FamilyMember,
   MedicationEntry,
   PatternResponse,
   SymptomEntry,
@@ -20,15 +22,52 @@ import {
 } from "@/lib/api/mock-store";
 import { deleteJson, fetchJson, postFormData, postJson, USE_MOCK_DATA } from "@/lib/api/client";
 
-export function getDashboard() {
-  return fetchJson<DashboardPayload>("/dashboard", getMockDashboard());
+// ─── Family Members ───────────────────────────────────────────────────────
+export function getFamilyMembers() {
+  if (USE_MOCK_DATA) return Promise.resolve([] as FamilyMember[]);
+  return fetchJson<FamilyMember[]>("/members", []);
 }
 
-export function getSymptoms() {
-  return fetchJson<SymptomEntry[]>("/symptoms?limit=25", getMockSymptoms());
+export function createFamilyMember(payload: {
+  name: string;
+  relation: string;
+  age_range: string;
+  sex?: string | null;
+  avatar_color?: string;
+  notes?: string | null;
+}) {
+  return postJson<FamilyMember, typeof payload>("/members", payload);
+}
+
+export function updateFamilyMember(id: string, payload: Partial<{
+  name: string;
+  relation: string;
+  age_range: string;
+  sex: string;
+  avatar_color: string;
+  notes: string;
+}>) {
+  return fetchJson<FamilyMember>(`/members/${id}`, null, "PATCH", payload);
+}
+
+export function deleteFamilyMember(id: string) {
+  return deleteJson(`/members/${id}`);
+}
+
+// ─── Dashboard ────────────────────────────────────────────────────────────
+export function getDashboard(memberId?: string) {
+  const qs = memberId ? `?member_id=${memberId}` : "";
+  return fetchJson<DashboardPayload>(`/dashboard${qs}`, getMockDashboard());
+}
+
+// ─── Symptoms ─────────────────────────────────────────────────────────────
+export function getSymptoms(memberId?: string) {
+  const qs = memberId ? `?member_id=${memberId}&limit=25` : "?limit=25";
+  return fetchJson<SymptomEntry[]>(`/symptoms${qs}`, getMockSymptoms());
 }
 
 export function createSymptom(payload: {
+  member_id?: string | null;
   symptom: string;
   severity: number;
   duration_hr?: number | null;
@@ -56,11 +95,14 @@ export function createSymptom(payload: {
   return postJson<SymptomEntry, typeof payload>("/symptoms", payload);
 }
 
-export function getMedications() {
-  return fetchJson<MedicationEntry[]>("/medications", getMockMedications());
+// ─── Medications ──────────────────────────────────────────────────────────
+export function getMedications(memberId?: string) {
+  const qs = memberId ? `?member_id=${memberId}` : "";
+  return fetchJson<MedicationEntry[]>(`/medications${qs}`, getMockMedications());
 }
 
 export function createMedication(payload: {
+  member_id?: string | null;
   name: string;
   dosage?: string | null;
   frequency?: string | null;
@@ -89,12 +131,23 @@ export function removeMedication(id: number) {
   return deleteJson(`/medications/${id}`);
 }
 
+export function getMedicationSuggestions(payload: {
+  disease_category: string;
+  triage_level: string;
+  severity?: number;
+  member_id?: string | null;
+}) {
+  return postJson<CareRecommendation, typeof payload>("/medications/suggest", payload);
+}
+
+// ─── Analysis ─────────────────────────────────────────────────────────────
 export function getAnalysisSummary() {
   return fetchJson<AnalysisSummaryItem[]>("/analysis/summary", getMockSummary());
 }
 
-export function getLongitudinalAnalysis() {
-  return fetchJson<LongitudinalAnalysis>("/analysis/longitudinal", {
+export function getLongitudinalAnalysis(memberId?: string) {
+  const qs = memberId ? `?member_id=${memberId}` : "";
+  return fetchJson<LongitudinalAnalysis>(`/analysis/longitudinal${qs}`, {
     total_logs_analyzed: 12,
     recent_anomaly_detected: false,
     anomaly_alert_message: null,
@@ -121,6 +174,7 @@ export function seedDemoData() {
   return postJson<{ message: string }, Record<string, never>>("/analysis/demo-data", {});
 }
 
+// ─── Image / Screener ─────────────────────────────────────────────────────
 export async function classifyImage(file: File) {
   const formData = new FormData();
   formData.append("file", file);
@@ -157,7 +211,11 @@ export async function evaluateAbcde(features: Record<string, boolean>) {
   }, typeof features>("/image/evaluate-abcde", features);
 }
 
-export async function askHealthAi(payload: { message: string; history?: Array<{ role: string; content: string }> }) {
+// ─── Chat ─────────────────────────────────────────────────────────────────
+export async function askHealthAi(payload: {
+  message: string;
+  history?: Array<{ role: string; content: string }>;
+}) {
   if (USE_MOCK_DATA) {
     try {
       return await postJson<{ reply: string }, typeof payload>("/chat", payload);
@@ -165,6 +223,5 @@ export async function askHealthAi(payload: { message: string; history?: Array<{ 
       return Promise.resolve(getMockChatReply(payload.message));
     }
   }
-
   return postJson<{ reply: string }, typeof payload>("/chat", payload);
 }

@@ -7,8 +7,10 @@ class Medication(Base):
 
     id = Column(Integer, primary_key=True, index=True, autoincrement=True)
     user_id = Column(String, ForeignKey("users.id"), default="default_user")
+    member_id = Column(String, ForeignKey("family_members.id"), nullable=True, index=True)
     name = Column(String, nullable=False)
     dosage = Column(String)
     frequency = Column(String)
     start_date = Column(Date)
     notes = Column(String)
+    source = Column(String, default="manual")   # "manual" or "who_suggested"

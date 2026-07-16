@@ -4,152 +4,98 @@ import React, { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/lib/auth";
-import { HeartPulse, ArrowRight, Sparkles, ShieldCheck } from "lucide-react";
+import { Heart, ArrowRight } from "lucide-react";
 import { toast } from "sonner";
 
+const inputCls = "mt-1.5 block w-full rounded-lg border border-border bg-white px-3.5 py-2.5 text-sm text-foreground placeholder-muted-foreground shadow-sm transition focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20";
+const labelCls = "block text-sm font-medium text-foreground";
+
 export default function RegisterPage() {
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
+  const [name, setName]         = useState("");
+  const [email, setEmail]       = useState("");
   const [password, setPassword] = useState("");
   const [ageRange, setAgeRange] = useState("adult");
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading]   = useState(false);
   const { register, enableGuestDemo } = useAuth();
   const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!email || !password || !name) {
-      toast.error("Please fill out all required fields.");
-      return;
-    }
-    if (password.length < 6) {
-      toast.error("Password must be at least 6 characters.");
-      return;
-    }
+    if (!email || !password || !name) { toast.error("Fill out all fields."); return; }
+    if (password.length < 6) { toast.error("Password must be at least 6 characters."); return; }
     setLoading(true);
     try {
       await register(email, password, name, ageRange);
-      toast.success("Account created successfully!");
       router.push("/dashboard");
     } catch (err: any) {
-      toast.error(err.message || "Registration failed. Try guest demo mode!");
+      toast.error(err.message || "Registration failed.");
     } finally {
       setLoading(false);
     }
   };
 
-  const handleGuestDemo = () => {
-    enableGuestDemo();
-    toast.success("Entering HealthGuard Demo Mode!");
-    router.push("/dashboard");
-  };
-
   return (
-    <div className="min-h-[100dvh] flex flex-col justify-center items-center bg-slate-950 text-slate-100 px-4 py-12">
-      {/* Brand Header */}
-      <Link href="/" className="flex items-center gap-3 mb-8 hover:opacity-90 transition">
-        <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-600 text-white shadow-lg shadow-emerald-600/30">
-          <HeartPulse className="h-6 w-6" />
+    <div className="flex min-h-[100dvh] flex-col items-center justify-center bg-background px-6 py-12">
+      {/* Logo */}
+      <Link href="/" className="mb-8 flex items-center gap-2">
+        <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary text-white">
+          <Heart className="h-4 w-4" />
         </div>
-        <span className="font-display text-2xl font-bold tracking-tight text-white">HealthGuard</span>
+        <span className="text-lg font-bold text-foreground">HealthGuard</span>
       </Link>
 
-      {/* Register Form Card */}
-      <div className="w-full max-w-md rounded-3xl border border-slate-800 bg-slate-900/90 p-8 shadow-2xl backdrop-blur">
-        <div className="text-center mb-8">
-          <h1 className="font-display text-2xl font-bold text-white">Create your account</h1>
-          <p className="text-sm text-slate-400 mt-1">Start tracking biometrics with explainable clinical AI</p>
-        </div>
+      <div className="w-full max-w-sm rounded-xl border border-border bg-white p-8 shadow-sm">
+        <h1 className="text-2xl font-bold text-foreground">Create account</h1>
+        <p className="mt-1 text-sm text-muted-foreground">
+          Set up your household health dashboard in seconds.
+        </p>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="mt-7 space-y-4">
           <div>
-            <label className="block text-xs font-semibold uppercase tracking-wider text-slate-300 mb-1.5">
-              Full Name
-            </label>
-            <input
-              type="text"
-              required
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              placeholder="Alex Rivera"
-              className="w-full rounded-xl border border-slate-700 bg-slate-950 px-4 py-3 text-sm text-white placeholder-slate-500 focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500 transition"
-            />
+            <label className={labelCls} htmlFor="name">Your name</label>
+            <input id="name" type="text" required value={name} onChange={(e) => setName(e.target.value)} placeholder="Priya Sharma" className={inputCls} />
           </div>
-
           <div>
-            <label className="block text-xs font-semibold uppercase tracking-wider text-slate-300 mb-1.5">
-              Email Address
-            </label>
-            <input
-              type="email"
-              required
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="patient@healthguard.ai"
-              className="w-full rounded-xl border border-slate-700 bg-slate-950 px-4 py-3 text-sm text-white placeholder-slate-500 focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500 transition"
-            />
+            <label className={labelCls} htmlFor="email">Email</label>
+            <input id="email" type="email" required value={email} onChange={(e) => setEmail(e.target.value)} placeholder="you@example.com" className={inputCls} />
           </div>
-
           <div>
-            <label className="block text-xs font-semibold uppercase tracking-wider text-slate-300 mb-1.5">
-              Age Range
-            </label>
-            <select
-              value={ageRange}
-              onChange={(e) => setAgeRange(e.target.value)}
-              className="w-full rounded-xl border border-slate-700 bg-slate-950 px-4 py-3 text-sm text-white focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500 transition"
-            >
-              <option value="child">Child / Adolescent (0 - 17)</option>
-              <option value="adult">Adult (18 - 64)</option>
+            <label className={labelCls} htmlFor="age_range">Your age range</label>
+            <select id="age_range" value={ageRange} onChange={(e) => setAgeRange(e.target.value)} className={inputCls}>
+              <option value="pediatric">Child / Teen (under 18)</option>
+              <option value="adult">Adult (18–64)</option>
               <option value="senior">Senior (65+)</option>
             </select>
           </div>
-
           <div>
-            <label className="block text-xs font-semibold uppercase tracking-wider text-slate-300 mb-1.5">
-              Password
-            </label>
-            <input
-              type="password"
-              required
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="At least 6 characters"
-              className="w-full rounded-xl border border-slate-700 bg-slate-950 px-4 py-3 text-sm text-white placeholder-slate-500 focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500 transition"
-            />
+            <label className={labelCls} htmlFor="password">Password</label>
+            <input id="password" type="password" required value={password} onChange={(e) => setPassword(e.target.value)} placeholder="At least 6 characters" className={inputCls} />
           </div>
-
           <button
             type="submit"
             disabled={loading}
-            className="w-full inline-flex items-center justify-center gap-2 rounded-xl bg-emerald-600 px-6 py-3.5 text-sm font-bold text-white shadow-lg shadow-emerald-600/25 transition hover:bg-emerald-500 disabled:opacity-50 whitespace-nowrap mt-2"
+            className="flex w-full items-center justify-center gap-2 rounded-lg bg-primary px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-primary/90 disabled:opacity-50"
           >
-            {loading ? "Creating Account..." : "Create Account"} <ArrowRight className="h-4 w-4" />
+            {loading ? "Creating…" : "Create account"} <ArrowRight className="h-4 w-4" />
           </button>
         </form>
 
-        <div className="relative my-6">
-          <div className="absolute inset-0 flex items-center">
-            <div className="w-full border-t border-slate-800" />
-          </div>
-          <div className="relative flex justify-center text-xs uppercase">
-            <span className="bg-slate-900 px-2 text-slate-500">Or explore first</span>
-          </div>
+        <div className="relative my-5">
+          <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-border" /></div>
+          <div className="relative flex justify-center"><span className="bg-white px-3 text-xs text-muted-foreground">or</span></div>
         </div>
 
         <button
           type="button"
-          onClick={handleGuestDemo}
-          className="w-full inline-flex items-center justify-center gap-2 rounded-xl border border-slate-700 bg-slate-800/80 px-6 py-3.5 text-sm font-semibold text-slate-200 transition hover:bg-slate-800 hover:border-slate-600 whitespace-nowrap"
+          onClick={() => { enableGuestDemo(); router.push("/dashboard"); }}
+          className="flex w-full items-center justify-center rounded-lg border border-border bg-white px-4 py-2.5 text-sm font-medium text-foreground shadow-sm transition hover:bg-muted"
         >
-          <Sparkles className="h-4 w-4 text-emerald-400" /> Enter Guest Demo Mode
+          Continue as guest
         </button>
 
-        <p className="mt-6 text-center text-xs text-slate-400">
-          Already have an account?{" "}
-          <Link href="/login" className="font-semibold text-emerald-400 hover:underline">
-            Sign in here
-          </Link>
+        <p className="mt-6 text-center text-sm text-muted-foreground">
+          Have an account?{" "}
+          <Link href="/login" className="font-semibold text-primary hover:underline">Sign in</Link>
         </p>
       </div>
     </div>

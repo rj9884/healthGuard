@@ -7,10 +7,10 @@ from app.repositories.symptom_repository import list_recent_symptoms
 from app.services.analysis_service import get_summary
 
 
-def build_dashboard_payload(db: Session, *, user_id: str) -> dict:
-    symptoms = list_recent_symptoms(db, user_id=user_id, limit=30)
-    medications = list_medications(db, user_id=user_id)
-    summary = get_summary(db, user_id=user_id)
+def build_dashboard_payload(db: Session, *, user_id: str, member_id: str | None = None) -> dict:
+    symptoms = list_recent_symptoms(db, user_id=user_id, member_id=member_id, limit=30)
+    medications = list_medications(db, user_id=user_id, member_id=member_id)
+    summary = get_summary(db, user_id=user_id, member_id=member_id)
 
     trigger_counter: Counter[str] = Counter()
     severity_trend = []
@@ -69,6 +69,9 @@ def build_dashboard_payload(db: Session, *, user_id: str) -> dict:
                 "triggers": entry.triggers or [],
                 "relief": entry.relief or [],
                 "notes": entry.notes,
+                "triage_level": getattr(entry, "triage_level", None),
+                "predicted_disease_risk": getattr(entry, "predicted_disease_risk", None),
+                "is_anomaly": getattr(entry, "is_anomaly", 0),
             }
             for entry in symptoms[:6]
         ],
