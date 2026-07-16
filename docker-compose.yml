@@ -1,4 +1,22 @@
 services:
+  db:
+    image: postgres:16-alpine
+    container_name: health_monitor_db
+    restart: unless-stopped
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=healthguard
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d healthguard"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
   backend:
     build:
       context: ./backend
@@ -9,11 +27,13 @@ services:
     env_file:
       - .env
     environment:
-      - DATABASE_URL=sqlite:////data/health_monitor.db
+      - DATABASE_URL=postgresql://postgres:postgres@db:5432/healthguard
       - HF_HOME=/hf_cache
     volumes:
-      - db_data:/data
       - hf_cache:/hf_cache
+    depends_on:
+      db:
+        condition: service_healthy
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
       interval: 10s
@@ -39,5 +59,5 @@ services:
     restart: unless-stopped
 
 volumes:
-  db_data:
+  pg_data:
   hf_cache:
